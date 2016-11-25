@@ -11,6 +11,7 @@ import android.os.Bundle;
 
 import com.bakkenbaeck.sol.R;
 import com.bakkenbaeck.sol.databinding.ActivitySunBinding;
+import com.bakkenbaeck.sol.util.CurrentCity;
 import com.bakkenbaeck.sol.util.SunriseSunset;
 import com.bakkenbaeck.sol.util.TimezoneMapper;
 import com.google.android.gms.common.ConnectionResult;
@@ -30,6 +31,7 @@ public class SunActivity extends BaseActivity implements GoogleApiClient.Connect
     private static final int PERMISSION_REQUEST_CODE = 123;
     private GoogleApiClient googleApiClient;
     private ActivitySunBinding binding;
+    private CurrentCity currentCity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,6 +114,13 @@ public class SunActivity extends BaseActivity implements GoogleApiClient.Connect
                 .appendSeparator(":")
                 .appendMinutes()
                 .toFormatter();
+
+        if (this.currentCity == null) {
+            this.currentCity = new CurrentCity(this);
+        }
+
+        final String nearestCity = this.currentCity.get(location.getLatitude(), location.getLongitude());
+        this.binding.todaysMessage.setText(nearestCity);
 
         final String todaysDate = DateTime.now().toString("dd. MM. YYYY");
         this.binding.todaysDate.setText(todaysDate);

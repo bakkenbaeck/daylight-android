@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">sol</string>
     <string name="notifications">NOTIFICATIONS</string>
+    <string name="default_city">your location</string>
 </resources>
