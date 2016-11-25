@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+        <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
+                <item name="colorPrimary">@color/gradient_top</item>
+                <item name="colorPrimaryDark">@color/gradient_top</item>
+                <item name="colorAccent">@color/gradient_bottom</item>
+                <item name="android:windowTranslucentStatus">true</item>
+        </style>
+</resources>

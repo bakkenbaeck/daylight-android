@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">sol</string>
+    <string name="notifications">NOTIFICATIONS</string>
 </resources>

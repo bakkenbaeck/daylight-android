@@ -17,6 +17,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    dataBinding {
+        enabled = true
+    }
 }
 
 dependencies {
@@ -27,6 +31,7 @@ dependencies {
             'com.google.android.gms:play-services-location:10.0.0',
             'net.danlew:android.joda:2.9.5',
             // Prettyness
-            'net.colindodd:gradientlayout:1.1'
+            'net.colindodd:gradientlayout:1.1',
+            'uk.co.chrisjenx:calligraphy:2.2.0'
     )
 }

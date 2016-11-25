@@ -11,7 +11,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:name=".BaseApplication">
-        <activity android:name=".SunActivity">
+        <activity android:name=".ui.SunActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

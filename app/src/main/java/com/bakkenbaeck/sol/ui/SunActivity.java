@@ -1,15 +1,16 @@
-package com.bakkenbaeck.sol;
+package com.bakkenbaeck.sol.ui;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.databinding.DataBindingUtil;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.TextView;
 
+import com.bakkenbaeck.sol.R;
+import com.bakkenbaeck.sol.databinding.ActivitySunBinding;
 import com.bakkenbaeck.sol.util.SunriseSunset;
 import com.bakkenbaeck.sol.util.TimezoneMapper;
 import com.google.android.gms.common.ConnectionResult;
@@ -19,25 +20,26 @@ import com.google.android.gms.location.LocationServices;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.Period;
-import org.joda.time.Seconds;
-import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 
 import java.util.Calendar;
-import java.util.Date;
 
-public class SunActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class SunActivity extends BaseActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static final int PERMISSION_REQUEST_CODE = 123;
     private GoogleApiClient googleApiClient;
+    private ActivitySunBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sun);
-
+        bindView();
         startGoogleApiClient();
+    }
+
+    private void bindView() {
+        this.binding = DataBindingUtil.setContentView(this, R.layout.activity_sun);
     }
 
     public void startGoogleApiClient() {
@@ -111,13 +113,12 @@ public class SunActivity extends AppCompatActivity implements GoogleApiClient.Co
                 .appendMinutes()
                 .toFormatter();
 
+        final String todaysDate = DateTime.now().toString("dd. MM. YYYY");
+        this.binding.todaysDate.setText(todaysDate);
+
         final String officialSunrise = sunrise.toString("HH:mm");
         final String officialSunset = sunset.toString("HH:mm");
         final String officialDayLength = minutesAndSeconds.print(dayLength);
-
-        ((TextView) findViewById(R.id.text_up)).setText(officialSunrise);
-        ((TextView) findViewById(R.id.text_down)).setText(officialSunset);
-        ((TextView) findViewById(R.id.text_total)).setText(officialDayLength);
     }
 
     @Override

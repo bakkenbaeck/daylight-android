@@ -5,4 +5,8 @@
     <color name="colorAccent">#FF4081</color>
     <color name="gradient_top">#983213</color>
     <color name="gradient_bottom">#F6FDB6</color>
+
+    <color name="primary_text">#969696</color>
+    <color name="secondary_text">#D3D3D3</color>
+    <color name="highlight_text">#000000</color>
 </resources>
