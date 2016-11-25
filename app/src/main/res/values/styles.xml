@@ -6,6 +6,7 @@
         <item name="colorPrimary">@color/gradient_top</item>
         <item name="colorPrimaryDark">@color/gradient_top</item>
         <item name="colorAccent">@color/gradient_bottom</item>
+        <item name="android:fitsSystemWindows">true</item>
     </style>
 
 </resources>

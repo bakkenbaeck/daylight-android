@@ -23,6 +23,7 @@ import org.joda.time.DateTimeZone;
 
 import java.sql.Date;
 import java.util.Calendar;
+import java.util.Locale;
 import java.util.TimeZone;
 
 /**
@@ -259,15 +260,15 @@ public class SunriseSunset {
      * @see <a href="http://en.wikipedia.org/wiki/Sunrise_equation">Sunrise equation on Wikipedia</a>
      */
     public static DateTime[] getSunriseSunsetDateTimes(
-            final Calendar day,
+            final DateTime day,
             final double latitude,
             final double longitude,
-            final String timezone) {
-        final Calendar[] calendars = getSunriseSunset(day, latitude, longitude, SUN_ALTITUDE_SUNRISE_SUNSET);
+            final DateTimeZone timezone) {
+        final Calendar dayAsCalendar = day.toCalendar(null);
+        final Calendar[] calendars = getSunriseSunset(dayAsCalendar, latitude, longitude, SUN_ALTITUDE_SUNRISE_SUNSET);
         final DateTime[] dateTimes = new DateTime[2];
-        final DateTimeZone dateTimeZone = DateTimeZone.forID(timezone);
-        dateTimes[0] = new DateTime(calendars[0], dateTimeZone);
-        dateTimes[1] = new DateTime(calendars[1], dateTimeZone);
+        dateTimes[0] = new DateTime(calendars[0], timezone);
+        dateTimes[1] = new DateTime(calendars[1], timezone);
         return dateTimes;
     }
 
