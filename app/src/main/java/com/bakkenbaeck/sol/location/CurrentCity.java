@@ -1,4 +1,4 @@
-package com.bakkenbaeck.sol.util;
+package com.bakkenbaeck.sol.location;
 
 
 import android.content.Context;

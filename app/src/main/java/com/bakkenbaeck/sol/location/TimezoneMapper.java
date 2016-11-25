@@ -1,6 +1,6 @@
 /** The provided code is written by Tim Cooper:   tim@edval.com.au
  This code is available under the MIT licence:  https://opensource.org/licenses/MIT  */
-package com.bakkenbaeck.sol.util;
+package com.bakkenbaeck.sol.location;
 
 public class TimezoneMapper {
 

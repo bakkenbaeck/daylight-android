@@ -2,4 +2,6 @@
     <string name="app_name">sol</string>
     <string name="notifications">NOTIFICATIONS</string>
     <string name="default_city">your location</string>
+    <string name="more">more</string>
+    <string name="fewer">fewer</string>
 </resources>

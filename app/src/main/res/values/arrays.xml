@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="daily_message">
+        <item>Today, {city} has {numMinutes} minutes {moreOrLess} sunlight than yesterday.</item>
+        <item>{numMinutes} {moreOrLess} minutes sunlight in {city} than yesterday.</item>
+    </string-array>
+</resources>

@@ -11,9 +11,11 @@ import android.os.Bundle;
 
 import com.bakkenbaeck.sol.R;
 import com.bakkenbaeck.sol.databinding.ActivitySunBinding;
-import com.bakkenbaeck.sol.util.CurrentCity;
-import com.bakkenbaeck.sol.util.SunriseSunset;
-import com.bakkenbaeck.sol.util.TimezoneMapper;
+import com.bakkenbaeck.sol.location.CurrentCity;
+import com.bakkenbaeck.sol.util.DailyMessage;
+import com.bakkenbaeck.sol.location.SunriseSunset;
+import com.bakkenbaeck.sol.location.TimezoneMapper;
+import com.bakkenbaeck.sol.util.DayLengthDifference;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -32,6 +34,7 @@ public class SunActivity extends BaseActivity implements GoogleApiClient.Connect
     private GoogleApiClient googleApiClient;
     private ActivitySunBinding binding;
     private CurrentCity currentCity;
+    private DailyMessage dailyMessage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,8 +122,13 @@ public class SunActivity extends BaseActivity implements GoogleApiClient.Connect
             this.currentCity = new CurrentCity(this);
         }
 
+        if (this.dailyMessage == null) {
+            this.dailyMessage = new DailyMessage(this);
+        }
+
         final String nearestCity = this.currentCity.get(location.getLatitude(), location.getLongitude());
-        this.binding.todaysMessage.setText(nearestCity);
+        final String todaysMessage = this.dailyMessage.get(nearestCity, 1, DayLengthDifference.LONGER);
+        this.binding.todaysMessage.setText(todaysMessage);
 
         final String todaysDate = DateTime.now().toString("dd. MM. YYYY");
         this.binding.todaysDate.setText(todaysDate);
