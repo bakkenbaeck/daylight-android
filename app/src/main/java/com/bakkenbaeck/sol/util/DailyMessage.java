@@ -20,13 +20,11 @@ public class DailyMessage {
 
     public Spanned get(final String city, final Period dayLengthChange) {
         final String diffText = getDiffText(dayLengthChange);
-        final int numMinutes =
-                Math.abs(dayLengthChange.getMinutes())
-                + Math.abs(dayLengthChange.getSeconds()) / 30;
+        final String numMinutesText = getNumberMinutesText(dayLengthChange);
 
         String message = getRawMessage();
         message = message.replace("{city}", city);
-        message = message.replace("{numMinutes}", String.valueOf(numMinutes));
+        message = message.replace("{numMinutes}", numMinutesText);
         message = message.replace("{moreOrLess}", diffText);
         return convertToHtml(message);
     }
@@ -47,6 +45,14 @@ public class DailyMessage {
                 dayLengthChangeInSeconds.isGreaterThan(Seconds.ZERO)
                         ? context.getResources().getString(R.string.more)
                         : context.getResources().getString(R.string.less);
+    }
+
+    @NonNull
+    private String getNumberMinutesText(final Period dayLengthChange) {
+        final int numMinutes =
+                Math.abs(dayLengthChange.getMinutes())
+                        + Math.abs(dayLengthChange.getSeconds()) / 30;
+        return this.context.getResources().getQuantityString(R.plurals.minutes, numMinutes, numMinutes);
     }
 
     private String getRawMessage() {
