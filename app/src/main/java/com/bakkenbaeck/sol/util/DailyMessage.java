@@ -1,32 +1,70 @@
 package com.bakkenbaeck.sol.util;
 
 import android.content.Context;
+import android.location.Location;
 import android.support.annotation.NonNull;
 import android.text.Html;
 import android.text.Spanned;
 
 import com.bakkenbaeck.sol.R;
+import com.bakkenbaeck.sol.location.CurrentCity;
+import com.bakkenbaeck.sol.location.SunriseSunset;
+
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.Duration;
 import org.joda.time.Period;
 import org.joda.time.Seconds;
 
 public class DailyMessage {
 
+    private final CurrentCity currentCity;
     private final Context context;
 
     public DailyMessage(final Context context) {
         this.context = context;
+        this.currentCity = new CurrentCity(context);
     }
 
-    public Spanned get(final String city, final Period dayLengthChange) {
+    public Spanned generate(final Location location, final DateTimeZone dateTimeZone) {
+        final Period dayLengthChange = getDayLengthChangeBetweenTodayAndYesterday(location, dateTimeZone);
+        final String city = getNearestCity(location);
         final String diffText = getDiffText(dayLengthChange);
         final String numMinutesText = getNumberMinutesText(dayLengthChange);
-
-        String message = getRawMessage();
-        message = message.replace("{city}", city);
-        message = message.replace("{numMinutes}", numMinutesText);
-        message = message.replace("{moreOrLess}", diffText);
+        final String tense = getCorrectTense(location, dateTimeZone);
+        
+        final String message = getRawMessage()
+                .replace("{city}", city)
+                .replace("{numMinutes}", numMinutesText)
+                .replace("{moreOrLess}", diffText)
+                .replace("{tense}", tense);
         return convertToHtml(message);
+    }
+
+    private Period getDayLengthChangeBetweenTodayAndYesterday(final Location location, final DateTimeZone dateTimeZone) {
+        final DateTime today = DateTime.now(dateTimeZone);
+        final DateTime yesterday = today.minusDays(1);
+
+        final Period todayLength = getDayLengthForLocation(location, today, dateTimeZone);
+        final Period yesterdayLength = getDayLengthForLocation(location, yesterday, dateTimeZone);
+        return todayLength.minus(yesterdayLength);
+    }
+
+    private Period getDayLengthForLocation(final Location location,
+                                           final DateTime day,
+                                           final DateTimeZone timezone) {
+        final DateTime[] sunriseSunset = SunriseSunset.getSunriseSunsetDateTimes(
+                day,
+                location.getLatitude(),
+                location.getLongitude(),
+                timezone);
+        final DateTime sunrise = sunriseSunset[0];
+        final DateTime sunset = sunriseSunset[1];
+        return new Duration(sunrise, sunset).toPeriod();
+    }
+
+    private String getNearestCity(final Location location) {
+        return this.currentCity.get(location.getLatitude(), location.getLongitude());
     }
 
     private Spanned convertToHtml(final String message) {
@@ -53,6 +91,19 @@ public class DailyMessage {
                 Math.abs(dayLengthChange.getMinutes())
                         + Math.abs(dayLengthChange.getSeconds()) / 30;
         return this.context.getResources().getQuantityString(R.plurals.minutes, numMinutes, numMinutes);
+    }
+
+    private String getCorrectTense(final Location location, final DateTimeZone dateTimeZone) {
+        final DateTime[] sunriseSunset = SunriseSunset.getSunriseSunsetDateTimes(
+                DateTime.now(dateTimeZone),
+                location.getLatitude(),
+                location.getLongitude(),
+                dateTimeZone);
+        final DateTime sunset = sunriseSunset[1];
+
+        return DateTime.now(dateTimeZone).isAfter(sunset)
+                ? this.context.getResources().getString(R.string.pastTense)
+                : this.context.getResources().getString(R.string.presentTense);
     }
 
     private String getRawMessage() {

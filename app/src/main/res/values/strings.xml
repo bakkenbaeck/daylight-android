@@ -4,4 +4,6 @@
     <string name="default_city">your location</string>
     <string name="more">more</string>
     <string name="less">less</string>
+    <string name="presentTense">has</string>
+    <string name="pastTense">had</string>
 </resources>

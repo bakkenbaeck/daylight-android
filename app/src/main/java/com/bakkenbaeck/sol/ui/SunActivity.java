@@ -12,27 +12,20 @@ import android.text.Spanned;
 
 import com.bakkenbaeck.sol.R;
 import com.bakkenbaeck.sol.databinding.ActivitySunBinding;
-import com.bakkenbaeck.sol.location.CurrentCity;
 import com.bakkenbaeck.sol.util.DailyMessage;
-import com.bakkenbaeck.sol.location.SunriseSunset;
 import com.bakkenbaeck.sol.location.TimezoneMapper;
-import com.bakkenbaeck.sol.util.DayLengthDifference;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.Duration;
-import org.joda.time.Period;
-import org.joda.time.Seconds;
 
 public class SunActivity extends BaseActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static final int PERMISSION_REQUEST_CODE = 123;
     private GoogleApiClient googleApiClient;
     private ActivitySunBinding binding;
-    private CurrentCity currentCity;
     private DailyMessage dailyMessage;
 
     @Override
@@ -44,7 +37,6 @@ public class SunActivity extends BaseActivity implements GoogleApiClient.Connect
 
     private void init() {
         this.binding = DataBindingUtil.setContentView(this, R.layout.activity_sun);
-        this.currentCity = new CurrentCity(this);
         this.dailyMessage = new DailyMessage(this);
     }
 
@@ -107,32 +99,11 @@ public class SunActivity extends BaseActivity implements GoogleApiClient.Connect
         final String timezone = TimezoneMapper.latLngToTimezoneString(location.getLatitude(), location.getLongitude());
         final DateTimeZone dateTimeZone = DateTimeZone.forID(timezone);
 
-        final DateTime today = DateTime.now(dateTimeZone);
-        final DateTime yesterday = today.minusDays(1);
-
-        final Period todayLength = getDayLengthForLocation(location, today, dateTimeZone);
-        final Period yesterdayLength = getDayLengthForLocation(location, yesterday, dateTimeZone);
-        final Period dayLengthChange = todayLength.minus(yesterdayLength);
-
-        final String nearestCity = this.currentCity.get(location.getLatitude(), location.getLongitude());
-        final Spanned todaysMessage = this.dailyMessage.get(nearestCity, dayLengthChange);
+        final Spanned todaysMessage = this.dailyMessage.generate(location, dateTimeZone);
         this.binding.todaysMessage.setText(todaysMessage);
 
         final String todaysDate = DateTime.now(dateTimeZone).toString("dd. MM. YYYY");
         this.binding.todaysDate.setText(todaysDate);
-    }
-
-    private Period getDayLengthForLocation(final Location location,
-                                           final DateTime day,
-                                           final DateTimeZone timezone) {
-        final DateTime[] sunriseSunset = SunriseSunset.getSunriseSunsetDateTimes(
-                day,
-                location.getLatitude(),
-                location.getLongitude(),
-                timezone);
-        final DateTime sunrise = sunriseSunset[0];
-        final DateTime sunset = sunriseSunset[1];
-        return new Duration(sunrise, sunset).toPeriod();
     }
 
     @Override

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="daily_message">
-        <item><![CDATA[Today, <font color=#000>{city}</font> has <font color=#000>{numMinutes}</font> {moreOrLess} sunlight than yesterday.]]></item>
+        <item><![CDATA[Today, <font color=#000>{city}</font> {tense} <font color=#000>{numMinutes}</font> {moreOrLess} sunlight than yesterday.]]></item>
     </string-array>
 </resources>
