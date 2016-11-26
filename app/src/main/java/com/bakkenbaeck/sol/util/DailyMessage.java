@@ -20,7 +20,9 @@ public class DailyMessage {
 
     public Spanned get(final String city, final Period dayLengthChange) {
         final String diffText = getDiffText(dayLengthChange);
-        final int numMinutes = Math.abs(dayLengthChange.getMinutes());
+        final int numMinutes =
+                Math.abs(dayLengthChange.getMinutes())
+                + Math.abs(dayLengthChange.getSeconds()) / 30;
 
         String message = getRawMessage();
         message = message.replace("{city}", city);
