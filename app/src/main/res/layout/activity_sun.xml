@@ -10,7 +10,7 @@
     android:orientation="vertical"
     gl:start_color="@color/gradient_top"
     gl:end_color="@color/gradient_bottom"
-    gl:orientation="BOTTOM_TOP"
+    gl:orientation="TOP_BOTTOM"
     tools:context="com.bakkenbaeck.sol.ui.SunActivity">
 
 
