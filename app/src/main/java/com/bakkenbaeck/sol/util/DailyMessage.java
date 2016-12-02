@@ -3,8 +3,6 @@ package com.bakkenbaeck.sol.util;
 import android.content.Context;
 import android.location.Location;
 import android.support.annotation.NonNull;
-import android.text.Html;
-import android.text.Spanned;
 
 import com.bakkenbaeck.sol.R;
 import com.bakkenbaeck.sol.location.CurrentCity;
@@ -26,19 +24,18 @@ public class DailyMessage {
         this.currentCity = new CurrentCity(context);
     }
 
-    public Spanned generate(final Location location, final DateTimeZone dateTimeZone) {
+    public String generate(final Location location, final DateTimeZone dateTimeZone) {
         final Period dayLengthChange = getDayLengthChangeBetweenTodayAndYesterday(location, dateTimeZone);
         final String city = getNearestCity(location);
         final String diffText = getDiffText(dayLengthChange);
         final String numMinutesText = getNumberMinutesText(dayLengthChange);
         final String tense = getCorrectTense(location, dateTimeZone);
-        
-        final String message = getRawMessage()
+
+        return getRawMessage()
                 .replace("{city}", city)
                 .replace("{numMinutes}", numMinutesText)
                 .replace("{moreOrLess}", diffText)
                 .replace("{tense}", tense);
-        return convertToHtml(message);
     }
 
     private Period getDayLengthChangeBetweenTodayAndYesterday(final Location location, final DateTimeZone dateTimeZone) {
@@ -65,14 +62,6 @@ public class DailyMessage {
 
     private String getNearestCity(final Location location) {
         return this.currentCity.get(location.getLatitude(), location.getLongitude());
-    }
-
-    private Spanned convertToHtml(final String message) {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            return Html.fromHtml(message, Html.FROM_HTML_MODE_LEGACY);
-        } else {
-            return Html.fromHtml(message);
-        }
     }
 
     @NonNull

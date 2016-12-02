@@ -1,116 +1,98 @@
 package com.bakkenbaeck.sol.ui;
 
 import android.Manifest;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
-import android.location.Location;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.text.Html;
 import android.text.Spanned;
+import android.view.View;
 
 import com.bakkenbaeck.sol.R;
 import com.bakkenbaeck.sol.databinding.ActivitySunBinding;
-import com.bakkenbaeck.sol.util.DailyMessage;
-import com.bakkenbaeck.sol.location.TimezoneMapper;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
+import com.bakkenbaeck.sol.service.SunsetService;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-
-public class SunActivity extends BaseActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class SunActivity extends BaseActivity {
 
     private static final int PERMISSION_REQUEST_CODE = 123;
-    private GoogleApiClient googleApiClient;
+
+    private SunsetBroadcastReceiver sunsetBroadcastReceiver = new SunsetBroadcastReceiver();
+
     private ActivitySunBinding binding;
-    private DailyMessage dailyMessage;
+    private PendingIntent pendingIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         init();
-        startGoogleApiClient();
+        checkForLocationPermission();
+    }
+
+    private void checkForLocationPermission() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_CODE);
+        } else {
+            startLocationService();
+        }
     }
 
     private void init() {
         this.binding = DataBindingUtil.setContentView(this, R.layout.activity_sun);
-        this.dailyMessage = new DailyMessage(this);
-    }
+        this.sunsetBroadcastReceiver = new SunsetBroadcastReceiver();
 
-    public void startGoogleApiClient() {
-        if (this.googleApiClient == null) {
-            googleApiClient = new GoogleApiClient.Builder(this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .build();
-        }
-    }
+/*
+        final Intent alarmIntent = new Intent(SunActivity.this, AlarmReceiver.class);
+        this.pendingIntent = PendingIntent.getBroadcast(SunActivity.this, 0, alarmIntent, 0);
 
-    protected void onStart() {
-        this.googleApiClient.connect();
-        super.onStart();
-    }
-
-    protected void onStop() {
-        this.googleApiClient.disconnect();
-        super.onStop();
-    }
-
-    @Override
-    public void onConnected(final @Nullable Bundle bundle) {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_CODE);
-            return;
-        }
-
-        getUsersLocation();
+        AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        int interval = 8000;
+        manager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + interval, pendingIntent);
+*/
     }
 
     @Override
     public void onRequestPermissionsResult(final int requestCode, final String[] permissions, final int[] grantResults) {
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            getUsersLocation();
+            startLocationService();
         } else {
-            useDefaultLocation();
+            startLocationService();
         }
     }
 
-    private void getUsersLocation() {
-        try {
-            final Location currentLocation = LocationServices.FusedLocationApi.getLastLocation(this.googleApiClient);
-            updateLocation(currentLocation);
-        } catch (final SecurityException ex) {
-            useDefaultLocation();
+    private void startLocationService() {
+        final Intent serviceIntent = new Intent(this, SunsetService.class);
+        startService(serviceIntent);
+
+        final IntentFilter intentFilter = new IntentFilter(SunsetService.ACTION_UPDATE);
+        intentFilter.addCategory(Intent.CATEGORY_DEFAULT);
+        registerReceiver(this.sunsetBroadcastReceiver, intentFilter);
+    }
+
+    private class SunsetBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(final Context context, final Intent intent) {
+            final String todaysMessage = intent.getStringExtra(SunsetService.EXTRA_DAILY_MESSAGE);
+            final Spanned todaysMessageFormatted = convertToHtml(todaysMessage);
+            binding.todaysMessage.setText(todaysMessageFormatted);
+
+            final String todaysDate = intent.getStringExtra(SunsetService.EXTRA_TODAYS_DATE);
+            binding.todaysDate.setText(todaysDate);
+
+            binding.loadingSpinner.setVisibility(View.GONE);
         }
-    }
 
-    private void useDefaultLocation() {
-        final Location defaultLocation = new android.location.Location("");
-        defaultLocation.setLatitude(59.9139);
-        defaultLocation.setLongitude(10.7522);
-        updateLocation(defaultLocation);
-    }
-
-    private void updateLocation(final Location location) {
-        final String timezone = TimezoneMapper.latLngToTimezoneString(location.getLatitude(), location.getLongitude());
-        final DateTimeZone dateTimeZone = DateTimeZone.forID(timezone);
-
-        final Spanned todaysMessage = this.dailyMessage.generate(location, dateTimeZone);
-        this.binding.todaysMessage.setText(todaysMessage);
-
-        final String todaysDate = DateTime.now(dateTimeZone).toString("dd. MM. YYYY");
-        this.binding.todaysDate.setText(todaysDate);
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {}
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        useDefaultLocation();
+        private Spanned convertToHtml(final String message) {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                return Html.fromHtml(message, Html.FROM_HTML_MODE_LEGACY);
+            } else {
+                return Html.fromHtml(message);
+            }
+        }
     }
 }
