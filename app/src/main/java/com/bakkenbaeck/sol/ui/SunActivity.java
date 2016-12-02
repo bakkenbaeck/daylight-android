@@ -1,6 +1,7 @@
 package com.bakkenbaeck.sol.ui;
 
 import android.Manifest;
+import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -16,6 +17,7 @@ import android.view.View;
 
 import com.bakkenbaeck.sol.R;
 import com.bakkenbaeck.sol.databinding.ActivitySunBinding;
+import com.bakkenbaeck.sol.service.AlarmReceiver;
 import com.bakkenbaeck.sol.service.SunsetService;
 
 public class SunActivity extends BaseActivity {
@@ -26,6 +28,7 @@ public class SunActivity extends BaseActivity {
 
     private ActivitySunBinding binding;
     private PendingIntent pendingIntent;
+    private long tomorrowsSunrise;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,14 +49,9 @@ public class SunActivity extends BaseActivity {
         this.binding = DataBindingUtil.setContentView(this, R.layout.activity_sun);
         this.sunsetBroadcastReceiver = new SunsetBroadcastReceiver();
 
-/*
         final Intent alarmIntent = new Intent(SunActivity.this, AlarmReceiver.class);
         this.pendingIntent = PendingIntent.getBroadcast(SunActivity.this, 0, alarmIntent, 0);
 
-        AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        int interval = 8000;
-        manager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + interval, pendingIntent);
-*/
     }
 
     @Override
@@ -84,7 +82,11 @@ public class SunActivity extends BaseActivity {
             final String todaysDate = intent.getStringExtra(SunsetService.EXTRA_TODAYS_DATE);
             binding.todaysDate.setText(todaysDate);
 
+            tomorrowsSunrise = intent.getLongExtra(SunsetService.EXTRA_TOMORROWS_SUNRISE, 0);
+
             binding.loadingSpinner.setVisibility(View.GONE);
+
+            enableAlarm();
         }
 
         private Spanned convertToHtml(final String message) {
@@ -94,5 +96,14 @@ public class SunActivity extends BaseActivity {
                 return Html.fromHtml(message);
             }
         }
+    }
+
+    private void enableAlarm() {
+        if (this.tomorrowsSunrise == 0) {
+            return;
+        }
+
+        final AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        manager.set(AlarmManager.RTC_WAKEUP, this.tomorrowsSunrise, pendingIntent);
     }
 }

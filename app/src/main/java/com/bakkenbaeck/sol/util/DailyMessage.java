@@ -24,6 +24,17 @@ public class DailyMessage {
         this.currentCity = new CurrentCity(context);
     }
 
+    public long getTomorrowsSunrise(final Location location, final DateTimeZone dateTimeZone) {
+        final DateTime tomorrow = DateTime.now(dateTimeZone).plusDays(1);
+        final DateTime[] sunriseSunset = SunriseSunset.getSunriseSunsetDateTimes(
+                tomorrow,
+                location.getLatitude(),
+                location.getLongitude(),
+                dateTimeZone);
+
+        return sunriseSunset[1].getMillis();
+    }
+
     public String generate(final Location location, final DateTimeZone dateTimeZone) {
         final Period dayLengthChange = getDayLengthChangeBetweenTodayAndYesterday(location, dateTimeZone);
         final String city = getNearestCity(location);

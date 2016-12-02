@@ -1,7 +1,7 @@
 package com.bakkenbaeck.sol.service;
 
 
-import android.app.Service;
+import android.app.IntentService;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
@@ -18,14 +18,21 @@ import com.google.android.gms.location.LocationServices;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-public class SunsetService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class SunsetService extends IntentService implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     public static final String ACTION_UPDATE = "com.example.androidintentservice.UPDATE";
     public static final String EXTRA_DAILY_MESSAGE = "daily_message";
     public static final String EXTRA_TODAYS_DATE = "todays_date";
+    public static final String EXTRA_TOMORROWS_SUNRISE = "tomorrows_sunrise";
+    public static final String EXTRA_SHOW_NOTIFICATION = "show_notification";
 
     private GoogleApiClient googleApiClient;
     private DailyMessage dailyMessage;
+    private boolean showNotification;
+
+    public SunsetService() {
+        super("com.bakkenbaeck.sol.service.SunsetService");
+    }
 
     @Override
     public void onCreate() {
@@ -36,6 +43,12 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
                 .addApi(LocationServices.API)
                 .build();
         this.dailyMessage = new DailyMessage(this);
+
+    }
+
+    @Override
+    protected void onHandleIntent(final Intent intent) {
+        this.showNotification = intent.getBooleanExtra(EXTRA_SHOW_NOTIFICATION, false);
     }
 
     @Override
@@ -71,7 +84,7 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
     }
 
     private void useDefaultLocation() {
-        final Location defaultLocation = new android.location.Location("");
+        final Location defaultLocation = new  android.location.Location("");
         defaultLocation.setLatitude(59.9139);
         defaultLocation.setLongitude(10.7522);
         updateLocation(defaultLocation);
@@ -83,12 +96,14 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
 
         final String todaysMessage = this.dailyMessage.generate(location, dateTimeZone);
         final String todaysDate = DateTime.now(dateTimeZone).toString("dd. MM. YYYY");
+        final long tomorrowsSunrise = this.dailyMessage.getTomorrowsSunrise(location, dateTimeZone);
 
         final Intent intentUpdate = new Intent();
         intentUpdate.setAction(ACTION_UPDATE);
         intentUpdate.addCategory(Intent.CATEGORY_DEFAULT);
         intentUpdate.putExtra(EXTRA_DAILY_MESSAGE, todaysMessage);
         intentUpdate.putExtra(EXTRA_TODAYS_DATE, todaysDate);
+        intentUpdate.putExtra(EXTRA_TOMORROWS_SUNRISE, tomorrowsSunrise);
         sendBroadcast(intentUpdate);
 
         stopSelf();
