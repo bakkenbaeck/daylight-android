@@ -1,14 +1,18 @@
 package com.bakkenbaeck.sol.service;
 
 
-import android.app.IntentService;
+import android.app.NotificationManager;
+import android.app.Service;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
+import android.text.Html;
 
+import com.bakkenbaeck.sol.R;
 import com.bakkenbaeck.sol.location.TimezoneMapper;
 import com.bakkenbaeck.sol.util.DailyMessage;
 import com.google.android.gms.common.ConnectionResult;
@@ -18,7 +22,7 @@ import com.google.android.gms.location.LocationServices;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-public class SunsetService extends IntentService implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class SunsetService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     public static final String ACTION_UPDATE = "com.example.androidintentservice.UPDATE";
     public static final String EXTRA_DAILY_MESSAGE = "daily_message";
@@ -30,10 +34,6 @@ public class SunsetService extends IntentService implements GoogleApiClient.Conn
     private DailyMessage dailyMessage;
     private boolean showNotification;
 
-    public SunsetService() {
-        super("com.bakkenbaeck.sol.service.SunsetService");
-    }
-
     @Override
     public void onCreate() {
         super.onCreate();
@@ -43,16 +43,11 @@ public class SunsetService extends IntentService implements GoogleApiClient.Conn
                 .addApi(LocationServices.API)
                 .build();
         this.dailyMessage = new DailyMessage(this);
-
-    }
-
-    @Override
-    protected void onHandleIntent(final Intent intent) {
-        this.showNotification = intent.getBooleanExtra(EXTRA_SHOW_NOTIFICATION, false);
     }
 
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
+        this.showNotification = intent.getBooleanExtra(EXTRA_SHOW_NOTIFICATION, false);
         this.googleApiClient.connect();
         return super.onStartCommand(intent, flags, startId);
     }
@@ -94,9 +89,9 @@ public class SunsetService extends IntentService implements GoogleApiClient.Conn
         final String timezone = TimezoneMapper.latLngToTimezoneString(location.getLatitude(), location.getLongitude());
         final DateTimeZone dateTimeZone = DateTimeZone.forID(timezone);
 
-        final String todaysMessage = this.dailyMessage.generate(location, dateTimeZone);
+        final String todaysMessage = this.dailyMessage.generate(location);
         final String todaysDate = DateTime.now(dateTimeZone).toString("dd. MM. YYYY");
-        final long tomorrowsSunrise = this.dailyMessage.getTomorrowsSunrise(location, dateTimeZone);
+        final long tomorrowsSunrise = this.dailyMessage.getTomorrowsSunrise(location);
 
         final Intent intentUpdate = new Intent();
         intentUpdate.setAction(ACTION_UPDATE);
@@ -106,7 +101,24 @@ public class SunsetService extends IntentService implements GoogleApiClient.Conn
         intentUpdate.putExtra(EXTRA_TOMORROWS_SUNRISE, tomorrowsSunrise);
         sendBroadcast(intentUpdate);
 
+        if (this.showNotification) {
+            showNotification(todaysMessage);
+        }
+
         stopSelf();
+    }
+
+    private void showNotification(final String todaysMessage) {
+        final NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentText(stripHtml(todaysMessage));
+        final NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        mNotifyMgr.notify(1, mBuilder.build());
+    }
+
+    public String stripHtml(final String html) {
+        return Html.fromHtml(html).toString();
     }
 
     @Override

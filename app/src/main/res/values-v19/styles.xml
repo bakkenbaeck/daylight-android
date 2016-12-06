@@ -2,9 +2,9 @@
 <resources>
 
         <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
-                <item name="colorPrimary">@color/gradient_top</item>
-                <item name="colorPrimaryDark">@color/gradient_top</item>
-                <item name="colorAccent">@color/gradient_bottom</item>
+                <item name="colorPrimary">@color/colorPrimary</item>
+                <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+                <item name="colorAccent">@color/colorAccent</item>
                 <item name="android:windowTranslucentStatus">true</item>
                 <item name="android:fitsSystemWindows">true</item>
         </style>

@@ -65,6 +65,7 @@ public class SunActivity extends BaseActivity {
 
     private void startLocationService() {
         final Intent serviceIntent = new Intent(this, SunsetService.class);
+        serviceIntent.putExtra(SunsetService.EXTRA_SHOW_NOTIFICATION, true);
         startService(serviceIntent);
 
         final IntentFilter intentFilter = new IntentFilter(SunsetService.ACTION_UPDATE);
