@@ -20,13 +20,17 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".service.AlarmReceiver" android:process=":remote">
+        <receiver
+            android:name=".service.AlarmReceiver"
+            android:process=":remote">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
 
-        <service android:name=".service.SunsetService" />
+        <service
+            android:name=".service.SunsetService"
+            android:exported="false"/>
     </application>
 
 </manifest>
