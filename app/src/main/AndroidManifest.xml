@@ -21,12 +21,14 @@
         </activity>
 
         <receiver
-            android:name=".service.AlarmReceiver"
+            android:name=".service.BootReceiver"
             android:process=":remote">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
+
+        <receiver android:name=".service.AlarmReceiver"/>
 
         <service
             android:name=".service.SunsetService"
