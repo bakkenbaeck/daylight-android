@@ -72,7 +72,11 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
     private void getUsersLocation() {
         try {
             final Location currentLocation = LocationServices.FusedLocationApi.getLastLocation(this.googleApiClient);
-            updateLocation(currentLocation);
+            if (currentLocation == null) {
+                useDefaultLocation();
+            } else {
+                updateLocation(currentLocation);
+            }
         } catch (final SecurityException ex) {
             useDefaultLocation();
         }
