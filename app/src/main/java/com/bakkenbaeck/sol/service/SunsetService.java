@@ -1,8 +1,11 @@
 package com.bakkenbaeck.sol.service;
 
 
+import android.app.AlarmManager;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
@@ -14,6 +17,7 @@ import android.text.Html;
 
 import com.bakkenbaeck.sol.R;
 import com.bakkenbaeck.sol.location.TimezoneMapper;
+import com.bakkenbaeck.sol.ui.SunActivity;
 import com.bakkenbaeck.sol.util.DailyMessage;
 import com.bakkenbaeck.sol.util.SolPreferences;
 import com.google.android.gms.common.ConnectionResult;
@@ -28,7 +32,6 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
     public static final String ACTION_UPDATE = "com.example.androidintentservice.UPDATE";
     public static final String EXTRA_DAILY_MESSAGE = "daily_message";
     public static final String EXTRA_TODAYS_DATE = "todays_date";
-    public static final String EXTRA_TOMORROWS_SUNRISE = "tomorrows_sunrise";
     public static final String EXTRA_SHOW_NOTIFICATION = "show_notification";
 
     private GoogleApiClient googleApiClient;
@@ -95,14 +98,23 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
         intentUpdate.addCategory(Intent.CATEGORY_DEFAULT);
         intentUpdate.putExtra(EXTRA_DAILY_MESSAGE, todaysMessage);
         intentUpdate.putExtra(EXTRA_TODAYS_DATE, todaysDate);
-        intentUpdate.putExtra(EXTRA_TOMORROWS_SUNRISE, tomorrowsSunrise);
         sendBroadcast(intentUpdate);
 
         if (this.showNotification) {
             showNotification(todaysMessage);
         }
 
+        enableTomorrowsAlarm(tomorrowsSunrise);
+
         stopSelf();
+    }
+
+    private void enableTomorrowsAlarm(final long alarmTime) {
+        final long temp = DateTime.now().plusSeconds(10).getMillis();
+        final Intent alarmIntent = new Intent(SunsetService.this, AlarmReceiver.class);
+        final PendingIntent pendingIntent = PendingIntent.getBroadcast(SunsetService.this, 0, alarmIntent, 0);
+        final AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        manager.set(AlarmManager.RTC_WAKEUP, temp, pendingIntent);
     }
 
     private Location storeLocation(final Location location) {
@@ -115,10 +127,13 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
     }
 
     private void showNotification(final String todaysMessage) {
+        final Intent resultIntent = new Intent(this, SunActivity.class);
+        final PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         final NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.mipmap.ic_launcher)
-                        .setContentText(stripHtml(todaysMessage));
+                        .setContentText(stripHtml(todaysMessage))
+                        .setContentIntent(resultPendingIntent);
         final NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         mNotifyMgr.notify(1, mBuilder.build());
     }
