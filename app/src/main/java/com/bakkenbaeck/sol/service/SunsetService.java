@@ -15,6 +15,7 @@ import android.text.Html;
 import com.bakkenbaeck.sol.R;
 import com.bakkenbaeck.sol.location.TimezoneMapper;
 import com.bakkenbaeck.sol.util.DailyMessage;
+import com.bakkenbaeck.sol.util.SolPreferences;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -33,6 +34,7 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
     private GoogleApiClient googleApiClient;
     private DailyMessage dailyMessage;
     private boolean showNotification;
+    private SolPreferences prefs;
 
     @Override
     public void onCreate() {
@@ -43,6 +45,7 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
                 .addApi(LocationServices.API)
                 .build();
         this.dailyMessage = new DailyMessage(this);
+        this.prefs = new SolPreferences(this);
     }
 
     @Override
@@ -72,30 +75,20 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
     private void getUsersLocation() {
         try {
             final Location currentLocation = LocationServices.FusedLocationApi.getLastLocation(this.googleApiClient);
-            if (currentLocation == null) {
-                useDefaultLocation();
-            } else {
-                updateLocation(currentLocation);
-            }
+            updateLocation(currentLocation);
         } catch (final SecurityException ex) {
-            useDefaultLocation();
+            updateLocation(null);
         }
     }
 
-    private void useDefaultLocation() {
-        final Location defaultLocation = new  android.location.Location("");
-        defaultLocation.setLatitude(59.9139);
-        defaultLocation.setLongitude(10.7522);
-        updateLocation(defaultLocation);
-    }
-
     private void updateLocation(final Location location) {
-        final String timezone = TimezoneMapper.latLngToTimezoneString(location.getLatitude(), location.getLongitude());
+        final Location safeLocation = storeLocation(location);
+        final String timezone = TimezoneMapper.latLngToTimezoneString(safeLocation);
         final DateTimeZone dateTimeZone = DateTimeZone.forID(timezone);
 
-        final String todaysMessage = this.dailyMessage.generate(location);
+        final String todaysMessage = this.dailyMessage.generate(safeLocation);
         final String todaysDate = DateTime.now(dateTimeZone).toString("dd. MM. YYYY");
-        final long tomorrowsSunrise = this.dailyMessage.getTomorrowsSunrise(location);
+        final long tomorrowsSunrise = this.dailyMessage.getTomorrowsSunrise(safeLocation);
 
         final Intent intentUpdate = new Intent();
         intentUpdate.setAction(ACTION_UPDATE);
@@ -110,6 +103,15 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
         }
 
         stopSelf();
+    }
+
+    private Location storeLocation(final Location location) {
+        if (location != null) {
+            this.prefs.cacheLocation(location);
+            return location;
+        }
+
+        return this.prefs.getCachedLocation();
     }
 
     private void showNotification(final String todaysMessage) {
@@ -130,6 +132,6 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        useDefaultLocation();
+        updateLocation(null);
     }
 }

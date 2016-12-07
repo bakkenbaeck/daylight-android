@@ -2,11 +2,12 @@
  This code is available under the MIT licence:  https://opensource.org/licenses/MIT  */
 package com.bakkenbaeck.sol.location;
 
+import android.location.Location;
+
 public class TimezoneMapper {
 
-    public static String latLngToTimezoneString(double lat, double lng)
-    {
-        String tzId = timezoneStrings[getTzInt((float) lat, (float) lng)];
+    public static String latLngToTimezoneString(final Location location) {
+        String tzId = timezoneStrings[getTzInt((float) location.getLatitude(), (float) location.getLongitude())];
         return tzId;
     }
 
