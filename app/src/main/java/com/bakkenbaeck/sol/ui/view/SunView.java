@@ -16,13 +16,6 @@ public class SunView extends View {
     private Paint paint;
     private Path path;
     private PathMeasure pm;
-
-    private int width;
-    private int height;
-    private int bottom;
-    private int left;
-    private int right;
-
     private int iCurStep = 0;
 
     private final int margin = dpToPx(32);
@@ -53,22 +46,21 @@ public class SunView extends View {
 
     @Override
     protected void onSizeChanged(final int w, final int h, final int oldw, final int oldh) {
-        this.width = w;
-        this.height = h;
-
-        this.bottom = this.height / 2;
-        this.left = margin;
-        this.right = this.width - margin;
+        final int width = w;
+        final int height = h;
+        final int bottom = height / 2;
+        final int left = margin;
+        final int right = width - margin;
 
         this.path = new Path();
-        this.path.moveTo(this.left, this.bottom);
+        this.path.moveTo(left, bottom);
         this.path.cubicTo(
-                margin * -1,
-                this.bottom - (margin * 5),
-                this.width + (margin / 2),
-                this.bottom - (margin * 5),
-                this.right,
-                this.bottom);
+                left,
+                bottom - (margin * 5),
+                right,
+                bottom - (margin * 5),
+                right,
+                bottom);
 
         this.pm = new PathMeasure(this.path, false);
 
