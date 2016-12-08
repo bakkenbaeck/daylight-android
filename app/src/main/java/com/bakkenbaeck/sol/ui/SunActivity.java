@@ -17,6 +17,8 @@ import com.bakkenbaeck.sol.R;
 import com.bakkenbaeck.sol.databinding.ActivitySunBinding;
 import com.bakkenbaeck.sol.service.SunsetService;
 
+import uk.co.chrisjenx.calligraphy.TypefaceUtils;
+
 public class SunActivity extends BaseActivity {
 
     private static final int PERMISSION_REQUEST_CODE = 123;
@@ -42,6 +44,7 @@ public class SunActivity extends BaseActivity {
     private void init() {
         this.binding = DataBindingUtil.setContentView(this, R.layout.activity_sun);
         this.sunsetBroadcastReceiver = new SunsetBroadcastReceiver();
+        this.binding.sunView.setTypeface(TypefaceUtils.load(getAssets(), "fonts/Regular.ttf"));
     }
 
     @Override

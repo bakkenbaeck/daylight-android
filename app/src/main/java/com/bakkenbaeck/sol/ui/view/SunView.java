@@ -9,6 +9,7 @@ import android.graphics.Path;
 import android.graphics.PathMeasure;
 import android.graphics.Rect;
 import android.graphics.Region;
+import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.View;
@@ -57,8 +58,14 @@ public class SunView extends View {
         this.textMargin = dpToPx(22);
     }
 
+    public SunView setTypeface(final Typeface typeface) {
+        this.paint.setTypeface(typeface);
+        return this;
+    }
+
     public SunView setColor(final int color) {
         this.paint.setColor(color);
+        return this;
     }
 
     public SunView setStartLabel(final String startLabel) {
