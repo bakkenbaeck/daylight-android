@@ -17,6 +17,8 @@ import com.bakkenbaeck.sol.R;
 import com.bakkenbaeck.sol.databinding.ActivitySunBinding;
 import com.bakkenbaeck.sol.service.SunsetService;
 
+import org.joda.time.DateTime;
+
 import uk.co.chrisjenx.calligraphy.TypefaceUtils;
 
 public class SunActivity extends BaseActivity {
@@ -77,6 +79,7 @@ public class SunActivity extends BaseActivity {
 
             binding.sunView.setStartLabel(intent.getStringExtra(SunsetService.EXTRA_SUNRISE_TIME));
             binding.sunView.setEndLabel(intent.getStringExtra(SunsetService.EXTRA_SUNSET_TIME));
+            binding.sunView.setFloatingLabel(DateTime.now().toString("HH:mm"));
 
             binding.loadingSpinner.setVisibility(View.GONE);
         }

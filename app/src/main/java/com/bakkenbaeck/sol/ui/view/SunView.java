@@ -25,12 +25,14 @@ public class SunView extends View {
     private PathMeasure pm;
     private String startLabel;
     private String endLabel;
+    private String floatingLabel;
     private int iCurStep = 0;
     private int viewMargin;
     private int textMargin;
     private int bottom;
     private int left;
     private int right;
+    private int width;
 
 
     public SunView(final Context context) {
@@ -53,7 +55,7 @@ public class SunView extends View {
         this.paint.setStyle(Paint.Style.FILL);
         this.paint.setColor(Color.RED);
         this.paint.setStrokeWidth(4);
-        this.paint.setTextSize(40);
+        this.paint.setTextSize(35);
         this.viewMargin = dpToPx(this.getContext().getResources().getDimension(R.dimen.activity_horizontal_margin));
         this.textMargin = dpToPx(22);
     }
@@ -78,8 +80,14 @@ public class SunView extends View {
         return this;
     }
 
+    public SunView setFloatingLabel(final String floatingLabel) {
+        this.floatingLabel = floatingLabel;
+        return this;
+    }
+
     @Override
     protected void onSizeChanged(final int w, final int h, final int oldw, final int oldh) {
+        this.width = w;
         this.bottom = h / 2;
         this.left = viewMargin;
         this.right = w - viewMargin;
@@ -119,7 +127,11 @@ public class SunView extends View {
 
         if (this.endLabel != null) {
             Rect bounds = new Rect();
-            this.paint.getTextBounds("23:59", 0, "23:59".length(), bounds);
+            this.paint.getTextBounds(
+                    this.endLabel,
+                    0,
+                    this.endLabel.length(),
+                    bounds);
             canvas.drawText(
                     this.endLabel,
                     this.right - bounds.width(),
@@ -139,9 +151,9 @@ public class SunView extends View {
 
     private void clipCanvas(final Canvas canvas) {
         canvas.clipRect(
-                this.left,
                 0,
-                this.right,
+                0,
+                this.width,
                 this.bottom,
                 Region.Op.REPLACE);
     }
@@ -149,21 +161,44 @@ public class SunView extends View {
     private void animateCircle(final Canvas canvas) {
         // This splits the curve up into 1000 bits and animates through them.
         float fSegmentLen = pm.getLength() / 1000;
-        float afP[] = {0f, 0f};
+        float coords[] = {0f, 0f};
 
         if (iCurStep <= 1000) {
-            pm.getPosTan(fSegmentLen * iCurStep, afP, null);
-            canvas.drawCircle(
-                    afP[0],
-                    afP[1],
-                    circleRadius,
-                    this.paint);
+            pm.getPosTan(fSegmentLen * iCurStep, coords, null);
+
+            drawCircle(canvas, coords);
+            drawFloatingLabel(canvas, coords);
+
             iCurStep++;
         } else {
             iCurStep = 0;
         }
 
         invalidate();
+    }
+
+    private void drawCircle(final Canvas canvas, final float[] coords) {
+        canvas.drawCircle(
+                coords[0],
+                coords[1],
+                circleRadius,
+                this.paint);
+    }
+
+    private void drawFloatingLabel(final Canvas canvas, final float[] afP) {
+        if (this.floatingLabel != null) {
+            Rect bounds = new Rect();
+            this.paint.getTextBounds(
+                    this.floatingLabel,
+                    0,
+                    this.floatingLabel.length(),
+                    bounds);
+            canvas.drawText(
+                    this.floatingLabel,
+                    afP[0] - (bounds.width() / 2),
+                    afP[1] - (bounds.height() * 2),
+                    this.paint);
+        }
     }
 
     private int dpToPx(final float dp){
