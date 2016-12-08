@@ -110,11 +110,10 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
     }
 
     private void enableTomorrowsAlarm(final long alarmTime) {
-        final long temp = DateTime.now().plusSeconds(10).getMillis();
         final Intent alarmIntent = new Intent(SunsetService.this, AlarmReceiver.class);
         final PendingIntent pendingIntent = PendingIntent.getBroadcast(SunsetService.this, 0, alarmIntent, 0);
         final AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        manager.set(AlarmManager.RTC_WAKEUP, temp, pendingIntent);
+        manager.set(AlarmManager.RTC_WAKEUP, alarmTime, pendingIntent);
     }
 
     private Location storeLocation(final Location location) {
