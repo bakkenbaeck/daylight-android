@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PathMeasure;
+import android.graphics.Rect;
 import android.graphics.Region;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
@@ -16,16 +17,20 @@ import com.bakkenbaeck.sol.R;
 
 public class SunView extends View {
 
+    private final int circleRadius = 20;
+
     private Paint paint;
     private Path path;
     private PathMeasure pm;
+    private String startLabel;
+    private String endLabel;
     private int iCurStep = 0;
-    private int margin;
+    private int viewMargin;
+    private int textMargin;
     private int bottom;
     private int left;
     private int right;
 
-    private final int circleRadius = 30;
 
     public SunView(final Context context) {
         super(context);
@@ -47,22 +52,34 @@ public class SunView extends View {
         this.paint.setStyle(Paint.Style.FILL);
         this.paint.setColor(Color.RED);
         this.paint.setStrokeWidth(4);
-        this.margin = dpToPx(this.getContext().getResources().getDimension(R.dimen.activity_horizontal_margin));
+        this.paint.setTextSize(40);
+        this.viewMargin = dpToPx(this.getContext().getResources().getDimension(R.dimen.activity_horizontal_margin));
+        this.textMargin = dpToPx(22);
+    }
+
+    public SunView setStartLabel(final String startLabel) {
+        this.startLabel = startLabel;
+        return this;
+    }
+
+    public SunView setEndLabel(final String endLabel) {
+        this.endLabel = endLabel;
+        return this;
     }
 
     @Override
     protected void onSizeChanged(final int w, final int h, final int oldw, final int oldh) {
         this.bottom = h / 2;
-        this.left = margin;
-        this.right = w - margin;
+        this.left = viewMargin;
+        this.right = w - viewMargin;
 
         this.path = new Path();
         this.path.moveTo(left + circleRadius, bottom);
         this.path.cubicTo(
                 left + circleRadius,
-                bottom - (margin * 5),
+                bottom - (viewMargin * 5),
                 right - circleRadius,
-                bottom - (margin * 5),
+                bottom - (viewMargin * 5),
                 right - circleRadius,
                 bottom);
 
@@ -74,12 +91,33 @@ public class SunView extends View {
     @Override
     protected void onDraw(final Canvas canvas) {
         super.onDraw(canvas);
+        drawLabels(canvas);
         clipCanvas(canvas);
         animateCircle(canvas);
         drawHorizontal(canvas);
     }
 
-    private void drawHorizontal(Canvas canvas) {
+    private void drawLabels(final Canvas canvas) {
+        if (this.startLabel != null) {
+            canvas.drawText(
+                    this.startLabel,
+                    this.left,
+                    this.bottom + this.textMargin,
+                    this.paint);
+        }
+
+        if (this.endLabel != null) {
+            Rect bounds = new Rect();
+            this.paint.getTextBounds("23:59", 0, "23:59".length(), bounds);
+            canvas.drawText(
+                    this.endLabel,
+                    this.right - bounds.width(),
+                    this.bottom + this.textMargin,
+                    this.paint);
+        }
+    }
+
+    private void drawHorizontal(final Canvas canvas) {
         canvas.drawLine(
                 this.left,
                 this.bottom,
@@ -88,7 +126,7 @@ public class SunView extends View {
                 this.paint);
     }
 
-    private void clipCanvas(Canvas canvas) {
+    private void clipCanvas(final Canvas canvas) {
         canvas.clipRect(
                 this.left,
                 0,
@@ -97,7 +135,7 @@ public class SunView extends View {
                 Region.Op.REPLACE);
     }
 
-    private void animateCircle(Canvas canvas) {
+    private void animateCircle(final Canvas canvas) {
         // This splits the curve up into 1000 bits and animates through them.
         float fSegmentLen = pm.getLength() / 1000;
         float afP[] = {0f, 0f};

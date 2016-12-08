@@ -6,8 +6,10 @@ import android.location.Location;
 import com.florianmski.suncalc.SunCalc;
 import com.florianmski.suncalc.models.SunPhase;
 
+import org.joda.time.DateTime;
 import org.joda.time.Period;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -40,6 +42,7 @@ public class ThreeDayPhases {
             return this;
         }
 
+
         final double lat = location.getLatitude();
         final double lon = location.getLongitude();
 
@@ -66,14 +69,30 @@ public class ThreeDayPhases {
         return new Period(dayLengthInMillis);
     }
 
-    private boolean shouldRefresh() {
-        final long refreshRate = 5000;
-        final long nextRefreshThreshold = lastRefreshTime + refreshRate;
-        return System.currentTimeMillis() > nextRefreshThreshold;
-    }
-
     public long getTomorrowsSunrise() {
         final SunPhase sunrise = this.tomorrowsSunPhases.get(SUNRISE);
         return sunrise.getStartDate().getTime().getTime();
+    }
+
+    public String getTodaysSunriseAsString() {
+        final SunPhase sunrise = this.todaysSunPhases.get(SUNRISE);
+        final DateTime dt = new DateTime(sunrise.getStartDate());
+        return dt.toString("HH:mm");
+    }
+
+    public String getTodaysSunsetAsString() {
+        final SunPhase sunset = this.todaysSunPhases.get(SUNSET);
+        final DateTime dt = new DateTime(sunset.getEndDate());
+        return dt.toString("HH:mm");
+    }
+
+    private boolean shouldRefresh() {
+        final long refreshRate = 5000;
+        final long nextRefreshThreshold = lastRefreshTime + refreshRate;
+        final boolean shouldRefresh = System.currentTimeMillis() > nextRefreshThreshold;
+        if (shouldRefresh) {
+            lastRefreshTime = System.currentTimeMillis();
+        }
+        return shouldRefresh;
     }
 }

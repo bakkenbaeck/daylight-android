@@ -13,25 +13,17 @@ import org.joda.time.Seconds;
 
 public class DailyMessage {
 
-    private final ThreeDayPhases threeDayPhases;
+
     private final CurrentCity currentCity;
     private final Context context;
 
     public DailyMessage(final Context context) {
         this.context = context;
         this.currentCity = new CurrentCity(context);
-        this.threeDayPhases = new ThreeDayPhases();
     }
 
-    public long getTomorrowsSunrise(final Location location) {
-        this.threeDayPhases.init(location);
-        return this.threeDayPhases.getTomorrowsSunrise();
-    }
-
-    public String generate(final Location location) {
-        this.threeDayPhases.init(location);
-
-        final Period dayLengthChange = this.threeDayPhases.getDayLengthChangeBetweenTodayAndYesterday();
+    public String generate(final ThreeDayPhases threeDayPhases, final Location location) {
+        final Period dayLengthChange = threeDayPhases.getDayLengthChangeBetweenTodayAndYesterday();
         final String city = getNearestCity(location);
         final String diffText = getDiffText(dayLengthChange);
         final String numMinutesText = getNumberMinutesText(dayLengthChange);

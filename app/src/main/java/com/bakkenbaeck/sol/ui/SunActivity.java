@@ -71,6 +71,10 @@ public class SunActivity extends BaseActivity {
 
             final String todaysDate = intent.getStringExtra(SunsetService.EXTRA_TODAYS_DATE);
             binding.todaysDate.setText(todaysDate);
+
+            binding.sunView.setStartLabel(intent.getStringExtra(SunsetService.EXTRA_SUNRISE_TIME));
+            binding.sunView.setEndLabel(intent.getStringExtra(SunsetService.EXTRA_SUNSET_TIME));
+
             binding.loadingSpinner.setVisibility(View.GONE);
         }
 

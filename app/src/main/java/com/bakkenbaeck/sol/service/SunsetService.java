@@ -20,6 +20,7 @@ import com.bakkenbaeck.sol.location.TimezoneMapper;
 import com.bakkenbaeck.sol.ui.SunActivity;
 import com.bakkenbaeck.sol.util.DailyMessage;
 import com.bakkenbaeck.sol.util.SolPreferences;
+import com.bakkenbaeck.sol.util.ThreeDayPhases;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -33,6 +34,8 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
     public static final String EXTRA_DAILY_MESSAGE = "daily_message";
     public static final String EXTRA_TODAYS_DATE = "todays_date";
     public static final String EXTRA_SHOW_NOTIFICATION = "show_notification";
+    public static final String EXTRA_SUNRISE_TIME = "sunrise_time";
+    public static final String EXTRA_SUNSET_TIME = "sunset_time";
 
     private GoogleApiClient googleApiClient;
     private DailyMessage dailyMessage;
@@ -88,16 +91,19 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
         final Location safeLocation = storeLocation(location);
         final String timezone = TimezoneMapper.latLngToTimezoneString(safeLocation);
         final DateTimeZone dateTimeZone = DateTimeZone.forID(timezone);
+        final ThreeDayPhases threeDayPhases = new ThreeDayPhases().init(safeLocation);
 
-        final String todaysMessage = this.dailyMessage.generate(safeLocation);
+        final String todaysMessage = this.dailyMessage.generate(threeDayPhases, safeLocation);
         final String todaysDate = DateTime.now(dateTimeZone).toString("dd. MM. YYYY");
-        final long tomorrowsSunrise = this.dailyMessage.getTomorrowsSunrise(safeLocation);
+        final long tomorrowsSunrise = threeDayPhases.getTomorrowsSunrise();
 
         final Intent intentUpdate = new Intent();
         intentUpdate.setAction(ACTION_UPDATE);
         intentUpdate.addCategory(Intent.CATEGORY_DEFAULT);
         intentUpdate.putExtra(EXTRA_DAILY_MESSAGE, todaysMessage);
         intentUpdate.putExtra(EXTRA_TODAYS_DATE, todaysDate);
+        intentUpdate.putExtra(EXTRA_SUNRISE_TIME, threeDayPhases.getTodaysSunriseAsString());
+        intentUpdate.putExtra(EXTRA_SUNSET_TIME, threeDayPhases.getTodaysSunsetAsString());
         sendBroadcast(intentUpdate);
 
         if (this.showNotification) {
