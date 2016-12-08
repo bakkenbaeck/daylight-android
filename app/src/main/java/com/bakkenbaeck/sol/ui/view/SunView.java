@@ -47,7 +47,7 @@ public class SunView extends View {
         init();
     }
 
-    private void init(){
+    private void init() {
         this.paint = new Paint();
         this.paint.setStyle(Paint.Style.FILL);
         this.paint.setColor(Color.RED);
@@ -55,6 +55,10 @@ public class SunView extends View {
         this.paint.setTextSize(40);
         this.viewMargin = dpToPx(this.getContext().getResources().getDimension(R.dimen.activity_horizontal_margin));
         this.textMargin = dpToPx(22);
+    }
+
+    public SunView setColor(final int color) {
+        this.paint.setColor(color);
     }
 
     public SunView setStartLabel(final String startLabel) {
