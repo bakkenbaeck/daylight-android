@@ -7,9 +7,12 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PathMeasure;
+import android.graphics.Region;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.View;
+
+import com.bakkenbaeck.sol.R;
 
 public class SunView extends View {
 
@@ -17,8 +20,12 @@ public class SunView extends View {
     private Path path;
     private PathMeasure pm;
     private int iCurStep = 0;
+    private int margin;
+    private int bottom;
+    private int left;
+    private int right;
 
-    private final int margin = dpToPx(32);
+    private final int circleRadius = 30;
 
     public SunView(final Context context) {
         super(context);
@@ -37,29 +44,26 @@ public class SunView extends View {
 
     private void init(){
         this.paint = new Paint();
-        this.paint.setStyle(Paint.Style.STROKE);
+        this.paint.setStyle(Paint.Style.FILL);
         this.paint.setColor(Color.RED);
-        this.paint.setStrokeWidth(7);
-
-
+        this.paint.setStrokeWidth(4);
+        this.margin = dpToPx(this.getContext().getResources().getDimension(R.dimen.activity_horizontal_margin));
     }
 
     @Override
     protected void onSizeChanged(final int w, final int h, final int oldw, final int oldh) {
-        final int width = w;
-        final int height = h;
-        final int bottom = height / 2;
-        final int left = margin;
-        final int right = width - margin;
+        this.bottom = h / 2;
+        this.left = margin;
+        this.right = w - margin;
 
         this.path = new Path();
-        this.path.moveTo(left, bottom);
+        this.path.moveTo(left + circleRadius, bottom);
         this.path.cubicTo(
-                left,
+                left + circleRadius,
                 bottom - (margin * 5),
-                right,
+                right - circleRadius,
                 bottom - (margin * 5),
-                right,
+                right - circleRadius,
                 bottom);
 
         this.pm = new PathMeasure(this.path, false);
@@ -70,12 +74,27 @@ public class SunView extends View {
     @Override
     protected void onDraw(final Canvas canvas) {
         super.onDraw(canvas);
-
-        // This draws the curve -- and can be removed when you're happy with the curve shape
-        canvas.drawPath(path, paint);
-
-        // This just shows how to render a circle over the Path
+        clipCanvas(canvas);
         animateCircle(canvas);
+        drawHorizontal(canvas);
+    }
+
+    private void drawHorizontal(Canvas canvas) {
+        canvas.drawLine(
+                this.left,
+                this.bottom,
+                this.right,
+                this.bottom,
+                this.paint);
+    }
+
+    private void clipCanvas(Canvas canvas) {
+        canvas.clipRect(
+                this.left,
+                0,
+                this.right,
+                this.bottom,
+                Region.Op.REPLACE);
     }
 
     private void animateCircle(Canvas canvas) {
@@ -85,7 +104,11 @@ public class SunView extends View {
 
         if (iCurStep <= 1000) {
             pm.getPosTan(fSegmentLen * iCurStep, afP, null);
-            canvas.drawCircle(afP[0],afP[1],30,this.paint);
+            canvas.drawCircle(
+                    afP[0],
+                    afP[1],
+                    circleRadius,
+                    this.paint);
             iCurStep++;
         } else {
             iCurStep = 0;
@@ -94,7 +117,7 @@ public class SunView extends View {
         invalidate();
     }
 
-    private int dpToPx(final int dp){
+    private int dpToPx(final float dp){
         return Math.round(dp*(getResources().getDisplayMetrics().xdpi/ DisplayMetrics.DENSITY_DEFAULT));
     }
 }
