@@ -36,6 +36,10 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
     public static final String EXTRA_SHOW_NOTIFICATION = "show_notification";
     public static final String EXTRA_SUNRISE_TIME = "sunrise_time";
     public static final String EXTRA_SUNSET_TIME = "sunset_time";
+    public static final String EXTRA_LOCATION_MESSAGE = "EXTRA_LOCATION_MESSAGE";
+
+    public static final String LOCATION_LATITUDE = "LOCATION_LATITUDE";
+    public static final String LOCATION_LONGITUDE = "LOCATION_LONGITUDE";
 
     private GoogleApiClient googleApiClient;
     private DailyMessage dailyMessage;
@@ -94,6 +98,7 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
         final ThreeDayPhases threeDayPhases = new ThreeDayPhases().init(safeLocation);
 
         final String todaysMessage = this.dailyMessage.generate(threeDayPhases, safeLocation);
+        final String locationMessage = this.dailyMessage.getLocation(location.getLatitude(), location.getLongitude());
         final String todaysDate = DateTime.now(dateTimeZone).toString("dd. MM. YYYY");
         final long tomorrowsSunrise = threeDayPhases.getTomorrowsSunrise();
 
@@ -104,6 +109,11 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
         intentUpdate.putExtra(EXTRA_TODAYS_DATE, todaysDate);
         intentUpdate.putExtra(EXTRA_SUNRISE_TIME, threeDayPhases.getTodaysSunriseAsString());
         intentUpdate.putExtra(EXTRA_SUNSET_TIME, threeDayPhases.getTodaysSunsetAsString());
+
+        intentUpdate.putExtra(EXTRA_LOCATION_MESSAGE, locationMessage);
+        intentUpdate.putExtra(LOCATION_LATITUDE, safeLocation.getLatitude());
+        intentUpdate.putExtra(LOCATION_LONGITUDE, safeLocation.getLongitude());
+
         sendBroadcast(intentUpdate);
 
         if (this.showNotification) {

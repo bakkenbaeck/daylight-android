@@ -3,9 +3,11 @@ package com.bakkenbaeck.sol.util;
 import android.content.Context;
 import android.location.Location;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 
 import com.bakkenbaeck.sol.R;
 import com.bakkenbaeck.sol.location.CurrentCity;
+import com.florianmski.suncalc.models.SunPhase;
 
 import org.joda.time.DateTime;
 import org.joda.time.Period;
@@ -28,7 +30,11 @@ public class DailyMessage {
         final String diffText = getDiffText(dayLengthChange);
         final String numMinutesText = getNumberMinutesText(dayLengthChange);
 
+        SunPhase phase = SunPhaseUtil.getSunPhase(location.getLatitude(), location.getLongitude());
+        int color = SunPhaseUtil.getPriColor(phase.getName().toString());
+
         return getRawMessage()
+                .replace("{color}", String.valueOf(ContextCompat.getColor(context, color)))
                 .replace("{city}", city)
                 .replace("{numMinutes}", numMinutesText)
                 .replace("{moreOrLess}", diffText);
@@ -36,6 +42,10 @@ public class DailyMessage {
 
     private String getNearestCity(final Location location) {
         return this.currentCity.get(location.getLatitude(), location.getLongitude());
+    }
+
+    public String getLocation(final double latitude, final double longitude) {
+        return currentCity.getCityAndCountry(latitude, longitude);
     }
 
     @NonNull

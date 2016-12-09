@@ -8,14 +8,17 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.text.Html;
 import android.text.Spanned;
-import android.view.View;
 
 import com.bakkenbaeck.sol.R;
 import com.bakkenbaeck.sol.databinding.ActivitySunBinding;
 import com.bakkenbaeck.sol.service.SunsetService;
+import com.bakkenbaeck.sol.util.SunPhaseUtil;
+import com.florianmski.suncalc.models.SunPhase;
 
 import org.joda.time.DateTime;
 
@@ -46,11 +49,11 @@ public class SunActivity extends BaseActivity {
     private void init() {
         this.binding = DataBindingUtil.setContentView(this, R.layout.activity_sun);
         this.sunsetBroadcastReceiver = new SunsetBroadcastReceiver();
-        this.binding.sunView.setTypeface(TypefaceUtils.load(getAssets(), "fonts/Regular.ttf"));
+        this.binding.sunView.setTypeface(TypefaceUtils.load(getAssets(), "fonts/gtamericalight.ttf"));
     }
 
     @Override
-    public void onRequestPermissionsResult(final int requestCode, final String[] permissions, final int[] grantResults) {
+    public void onRequestPermissionsResult(final int requestCode, @NonNull final String[] permissions, @NonNull final int[] grantResults) {
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             startLocationService();
         } else {
@@ -72,16 +75,15 @@ public class SunActivity extends BaseActivity {
         public void onReceive(final Context context, final Intent intent) {
             final String todaysMessage = intent.getStringExtra(SunsetService.EXTRA_DAILY_MESSAGE);
             final Spanned todaysMessageFormatted = convertToHtml(todaysMessage);
-            binding.todaysMessage.setText(todaysMessageFormatted);
 
-            final String todaysDate = intent.getStringExtra(SunsetService.EXTRA_TODAYS_DATE);
-            binding.todaysDate.setText(todaysDate);
+            String sunriseTime = intent.getStringExtra(SunsetService.EXTRA_SUNRISE_TIME);
+            String sunsetTime = intent.getStringExtra(SunsetService.EXTRA_SUNSET_TIME);
+            String locationMessage = intent.getStringExtra(SunsetService.EXTRA_LOCATION_MESSAGE);
 
-            binding.sunView.setStartLabel(intent.getStringExtra(SunsetService.EXTRA_SUNRISE_TIME));
-            binding.sunView.setEndLabel(intent.getStringExtra(SunsetService.EXTRA_SUNSET_TIME));
-            binding.sunView.setFloatingLabel(DateTime.now().toString("HH:mm"));
+            double latitude = intent.getDoubleExtra(SunsetService.LOCATION_LATITUDE, 0);
+            double longitude = intent.getDoubleExtra(SunsetService.LOCATION_LONGITUDE, 0);
 
-            binding.loadingSpinner.setVisibility(View.GONE);
+            updateView(latitude, longitude, todaysMessageFormatted, sunriseTime, sunsetTime, locationMessage);
         }
 
         private Spanned convertToHtml(final String message) {
@@ -91,5 +93,25 @@ public class SunActivity extends BaseActivity {
                 return Html.fromHtml(message);
             }
         }
+    }
+
+    private void updateView(final double latitude, final double longitude, Spanned todaysText,
+                            String sunriseTime, String sunsetTime, String locationMessage) {
+        SunPhase phase = SunPhaseUtil.getSunPhase(latitude, longitude);
+        int color = SunPhaseUtil.getBackgroundColor(phase.getName().toString());
+        int secColor = SunPhaseUtil.getSecColor(phase.getName().toString());
+        int priColor = SunPhaseUtil.getPriColor(phase.getName().toString());
+
+        binding.todaysMessage.setText(todaysText);
+        binding.activitySun.setBackgroundColor(ContextCompat.getColor(this, color));
+        binding.todaysMessage.setTextColor(ContextCompat.getColor(this, secColor));
+        binding.location.setTextColor(ContextCompat.getColor(this, secColor));
+        binding.share.setTextColor(ContextCompat.getColor(this, secColor));
+        binding.location.setText(locationMessage);
+
+        binding.sunView.setColor(ContextCompat.getColor(this, priColor));
+        binding.sunView.setStartLabel(sunriseTime);
+        binding.sunView.setEndLabel(sunsetTime);
+        binding.sunView.setFloatingLabel(DateTime.now().toString("HH:mm"));
     }
 }
