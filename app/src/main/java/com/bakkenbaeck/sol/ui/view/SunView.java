@@ -11,7 +11,6 @@ import android.graphics.Rect;
 import android.graphics.Region;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.view.View;
 
 import com.bakkenbaeck.sol.R;
@@ -55,9 +54,9 @@ public class SunView extends View {
         this.paint.setStyle(Paint.Style.FILL);
         this.paint.setColor(Color.RED);
         this.paint.setStrokeWidth(4);
-        this.paint.setTextSize(35);
-        this.viewMargin = dpToPx(this.getContext().getResources().getDimension(R.dimen.activity_horizontal_margin));
-        this.textMargin = dpToPx(22);
+        this.paint.setTextSize(this.getContext().getResources().getDimensionPixelSize(R.dimen.text_size_tert));
+        this.viewMargin = this.getContext().getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin);
+        this.textMargin = this.getContext().getResources().getDimensionPixelSize(R.dimen.text_margin);
     }
 
     public SunView setTypeface(final Typeface typeface) {
@@ -199,9 +198,5 @@ public class SunView extends View {
                     afP[1] - (bounds.height() * 2),
                     this.paint);
         }
-    }
-
-    private int dpToPx(final float dp){
-        return Math.round(dp*(getResources().getDisplayMetrics().xdpi/ DisplayMetrics.DENSITY_DEFAULT));
     }
 }

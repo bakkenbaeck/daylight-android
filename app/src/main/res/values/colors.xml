@@ -9,4 +9,25 @@
     <color name="primary_text">#969696</color>
     <color name="secondary_text">#D3D3D3</color>
     <color name="highlight_text">#000000</color>
+
+    <color name="sunrise">#FFED9E</color>
+    <color name="daylight">#FFDC9C</color>
+    <color name="night">#031320</color>
+    <color name="twilight_astronomical">#D0E5FF</color>
+    <color name="twilight_nautical">#D0E5FF</color>
+    <color name="twilight_civil">#D0E5FF</color>
+    <color name="golden_hour">#FFDC9C</color>
+    <color name="sunset">#FFC3AD</color>
+
+    <color name="sunrise_text">#99EA5700</color>
+    <color name="daylight_text">#99AB4621</color>
+    <color name="sunset_text">#99AB4621</color>
+    <color name="twilight_text">#993C57A0</color>
+    <color name="night_text">#9980D0F3</color>
+
+    <color name="sunrise_text2">#EA5700</color>
+    <color name="daylight_text2">#AB4621</color>
+    <color name="sunset_text2">#AB4621</color>
+    <color name="twilight_text2">#3C57A0</color>
+    <color name="night_text2">#80D0F3</color>
 </resources>

@@ -21,7 +21,7 @@ public class BaseApplication extends Application {
 
     private void initCalligraphy() {
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/Regular.ttf")
+                .setDefaultFontPath("fonts/gtamericalight.ttf")
                 .setFontAttrId(R.attr.fontPath)
                 .build()
         );

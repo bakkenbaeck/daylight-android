@@ -3,6 +3,7 @@ package com.bakkenbaeck.sol.util;
 import android.content.Context;
 import android.location.Location;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 
 import com.bakkenbaeck.sol.R;
 import com.bakkenbaeck.sol.location.CurrentCity;
@@ -28,7 +29,11 @@ public class DailyMessage {
         final String diffText = getDiffText(dayLengthChange);
         final String numMinutesText = getNumberMinutesText(dayLengthChange);
 
+        final CurrentPhase phase = threeDayPhases.getCurrentPhase();
+        final int primaryColor = phase.getPrimaryColor();
+
         return getRawMessage()
+                .replace("{color}", String.valueOf(ContextCompat.getColor(context, primaryColor)))
                 .replace("{city}", city)
                 .replace("{numMinutes}", numMinutesText)
                 .replace("{moreOrLess}", diffText);
@@ -36,6 +41,10 @@ public class DailyMessage {
 
     private String getNearestCity(final Location location) {
         return this.currentCity.get(location.getLatitude(), location.getLongitude());
+    }
+
+    public String getLocation(final double latitude, final double longitude) {
+        return currentCity.getCityAndCountry(latitude, longitude);
     }
 
     @NonNull

@@ -39,6 +39,22 @@ public class CurrentCity {
         }
     }
 
+    public String getCityAndCountry(final double latitude, final double longitude) {
+        final Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+        try {
+            final List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+            final Address address = addresses.get(0);
+
+            if (address == null) {
+                return defaultCity();
+            }
+
+            return String.format("%s, %s", address.getLocality(), address.getCountryName());
+        } catch (IOException e) {
+            return defaultCity();
+        }
+    }
+
     @NonNull
     private String defaultCity() {
         return context.getString(R.string.default_city);
