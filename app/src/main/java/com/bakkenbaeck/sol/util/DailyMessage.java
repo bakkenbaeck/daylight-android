@@ -7,7 +7,6 @@ import android.support.v4.content.ContextCompat;
 
 import com.bakkenbaeck.sol.R;
 import com.bakkenbaeck.sol.location.CurrentCity;
-import com.florianmski.suncalc.models.SunPhase;
 
 import org.joda.time.DateTime;
 import org.joda.time.Period;
@@ -30,11 +29,11 @@ public class DailyMessage {
         final String diffText = getDiffText(dayLengthChange);
         final String numMinutesText = getNumberMinutesText(dayLengthChange);
 
-        SunPhase phase = SunPhaseUtil.getSunPhase(location.getLatitude(), location.getLongitude());
-        int color = SunPhaseUtil.getPriColor(phase.getName().toString());
+        final CurrentPhase phase = threeDayPhases.getCurrentPhase();
+        final int primaryColor = phase.getPrimaryColor();
 
         return getRawMessage()
-                .replace("{color}", String.valueOf(ContextCompat.getColor(context, color)))
+                .replace("{color}", String.valueOf(ContextCompat.getColor(context, primaryColor)))
                 .replace("{city}", city)
                 .replace("{numMinutes}", numMinutesText)
                 .replace("{moreOrLess}", diffText);

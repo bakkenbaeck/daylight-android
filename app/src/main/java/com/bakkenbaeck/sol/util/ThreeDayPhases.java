@@ -95,4 +95,14 @@ public class ThreeDayPhases {
         }
         return shouldRefresh;
     }
+
+    public CurrentPhase getCurrentPhase() {
+        final Calendar now = Calendar.getInstance();
+        for (final SunPhase phase : this.todaysSunPhases) {
+            if (phase.getEndDate().after(now)) {
+                return new CurrentPhase(phase);
+            }
+        }
+        return new CurrentPhase(this.todaysSunPhases.get(0));
+    }
 }

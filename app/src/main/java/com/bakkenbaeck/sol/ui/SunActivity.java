@@ -17,8 +17,7 @@ import android.text.Spanned;
 import com.bakkenbaeck.sol.R;
 import com.bakkenbaeck.sol.databinding.ActivitySunBinding;
 import com.bakkenbaeck.sol.service.SunsetService;
-import com.bakkenbaeck.sol.util.SunPhaseUtil;
-import com.florianmski.suncalc.models.SunPhase;
+import com.bakkenbaeck.sol.util.CurrentPhase;
 
 import org.joda.time.DateTime;
 
@@ -76,14 +75,12 @@ public class SunActivity extends BaseActivity {
             final String todaysMessage = intent.getStringExtra(SunsetService.EXTRA_DAILY_MESSAGE);
             final Spanned todaysMessageFormatted = convertToHtml(todaysMessage);
 
-            String sunriseTime = intent.getStringExtra(SunsetService.EXTRA_SUNRISE_TIME);
-            String sunsetTime = intent.getStringExtra(SunsetService.EXTRA_SUNSET_TIME);
-            String locationMessage = intent.getStringExtra(SunsetService.EXTRA_LOCATION_MESSAGE);
+            final String sunriseTime = intent.getStringExtra(SunsetService.EXTRA_SUNRISE_TIME);
+            final String sunsetTime = intent.getStringExtra(SunsetService.EXTRA_SUNSET_TIME);
+            final String locationMessage = intent.getStringExtra(SunsetService.EXTRA_LOCATION_MESSAGE);
+            final CurrentPhase currentPhase = new CurrentPhase(intent.getStringExtra(SunsetService.EXTRA_CURRENT_PHASE));
 
-            double latitude = intent.getDoubleExtra(SunsetService.LOCATION_LATITUDE, 0);
-            double longitude = intent.getDoubleExtra(SunsetService.LOCATION_LONGITUDE, 0);
-
-            updateView(latitude, longitude, todaysMessageFormatted, sunriseTime, sunsetTime, locationMessage);
+            updateView(todaysMessageFormatted, sunriseTime, sunsetTime, locationMessage, currentPhase);
         }
 
         private Spanned convertToHtml(final String message) {
@@ -95,23 +92,26 @@ public class SunActivity extends BaseActivity {
         }
     }
 
-    private void updateView(final double latitude, final double longitude, Spanned todaysText,
-                            String sunriseTime, String sunsetTime, String locationMessage) {
-        SunPhase phase = SunPhaseUtil.getSunPhase(latitude, longitude);
-        int color = SunPhaseUtil.getBackgroundColor(phase.getName().toString());
-        int secColor = SunPhaseUtil.getSecColor(phase.getName().toString());
-        int priColor = SunPhaseUtil.getPriColor(phase.getName().toString());
+    private void updateView(final Spanned todaysText,
+                            final String sunriseTime,
+                            final String sunsetTime,
+                            final String locationMessage,
+                            final CurrentPhase currentPhase) {
 
-        binding.todaysMessage.setText(todaysText);
-        binding.activitySun.setBackgroundColor(ContextCompat.getColor(this, color));
-        binding.todaysMessage.setTextColor(ContextCompat.getColor(this, secColor));
-        binding.location.setTextColor(ContextCompat.getColor(this, secColor));
-        binding.share.setTextColor(ContextCompat.getColor(this, secColor));
-        binding.location.setText(locationMessage);
+        final int color = currentPhase.getBackgroundColor();
+        final int secColor = currentPhase.getSecondaryColor();
+        final int priColor = currentPhase.getPrimaryColor();
 
-        binding.sunView.setColor(ContextCompat.getColor(this, priColor));
-        binding.sunView.setStartLabel(sunriseTime);
-        binding.sunView.setEndLabel(sunsetTime);
-        binding.sunView.setFloatingLabel(DateTime.now().toString("HH:mm"));
+        this.binding.todaysMessage.setText(todaysText);
+        this.binding.activitySun.setBackgroundColor(ContextCompat.getColor(this, color));
+        this.binding.todaysMessage.setTextColor(ContextCompat.getColor(this, secColor));
+        this.binding.location.setTextColor(ContextCompat.getColor(this, secColor));
+        this.binding.share.setTextColor(ContextCompat.getColor(this, secColor));
+        this.binding.location.setText(locationMessage);
+        this.binding.sunView.setColor(ContextCompat.getColor(this, priColor));
+        this.binding.sunView.setStartLabel(sunriseTime);
+        this.binding.sunView.setEndLabel(sunsetTime);
+        this.binding.sunView.setFloatingLabel(DateTime.now().toString("HH:mm"));
     }
 }
+
