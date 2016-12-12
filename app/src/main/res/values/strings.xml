@@ -7,4 +7,7 @@
     <string name="presentTense">has</string>
     <string name="pastTense">had</string>
     <string name="share">Share</string>
+    <string name="sol">Sol</string>
+    <string name="info_message"><![CDATA[Sol is an experiment by <font color={color}>Bakken & Bæck</font>, inspired by the dark and long winters of the north.]]></string>
+    <string name="turn_notifications">Turn notifications</string>
 </resources>

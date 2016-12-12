@@ -9,6 +9,7 @@ public class SolPreferences {
 
     private static final String LAT_PREF = "lat_pref";
     private static final String LON_PREF = "lon_pref";
+    private static final String SHOW_NOTIFICATIONS = "show_notifications";
 
     private static final double DEFAULT_LAT = 59.9139;
     private static final double DEFAULT_LON = 10.7522;
@@ -55,6 +56,11 @@ public class SolPreferences {
         return Double.longBitsToDouble(this.prefs.getLong(key, Double.doubleToLongBits(defaultValue)));
     }
 
+    public void cacheShowNotification(final boolean showNotification) {
+        prefs.edit().putBoolean(SHOW_NOTIFICATIONS, showNotification).apply();
+    }
 
-
+    public boolean getShowNotification() {
+        return prefs.getBoolean(SHOW_NOTIFICATIONS, false);
+    }
 }

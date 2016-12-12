@@ -6,4 +6,7 @@
     <dimen name="text_size_pri">32sp</dimen>
     <dimen name="text_size_sec">16sp</dimen>
     <dimen name="text_size_tert">12sp</dimen>
+
+    <dimen name="horizont_bottom_margin">20dp</dimen>
+    <dimen name="sun_size">16dp</dimen>
 </resources>

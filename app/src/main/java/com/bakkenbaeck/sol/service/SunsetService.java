@@ -28,7 +28,8 @@ import com.google.android.gms.location.LocationServices;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-public class SunsetService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class SunsetService extends Service implements GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener {
 
     public static final String ACTION_UPDATE = "com.example.androidintentservice.UPDATE";
     public static final String EXTRA_DAILY_MESSAGE = "daily_message";
@@ -38,6 +39,9 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
     public static final String EXTRA_SUNSET_TIME = "sunset_time";
     public static final String EXTRA_LOCATION_MESSAGE = "location_message";
     public static final String EXTRA_CURRENT_PHASE = "current_phase";
+
+    public static final String EXTRA_LAT = "extra_lat";
+    public static final String EXTRA_LON = "extra_lon";
 
     private GoogleApiClient googleApiClient;
     private DailyMessage dailyMessage;
@@ -95,11 +99,12 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
         final DateTimeZone dateTimeZone = DateTimeZone.forID(timezone);
         final ThreeDayPhases threeDayPhases = new ThreeDayPhases().init(safeLocation);
 
-        final String todaysMessage = this.dailyMessage.generate(threeDayPhases, safeLocation);
-        final String locationMessage = this.dailyMessage.getLocation(safeLocation.getLatitude(), safeLocation.getLongitude());
         final String todaysDate = DateTime.now(dateTimeZone).toString("dd. MM. YYYY");
         final String currentPhaseName = threeDayPhases.getCurrentPhase().getName();
         final long tomorrowsSunrise = threeDayPhases.getTomorrowsSunrise();
+
+        final String todaysMessage = this.dailyMessage.generate(threeDayPhases, safeLocation);
+        final String locationMessage = this.dailyMessage.getLocation(safeLocation.getLatitude(), safeLocation.getLongitude());
 
         final Intent intentUpdate = new Intent();
         intentUpdate.setAction(ACTION_UPDATE);
@@ -110,6 +115,9 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
         intentUpdate.putExtra(EXTRA_SUNSET_TIME, threeDayPhases.getTodaysSunsetAsString());
         intentUpdate.putExtra(EXTRA_LOCATION_MESSAGE, locationMessage);
         intentUpdate.putExtra(EXTRA_CURRENT_PHASE, currentPhaseName);
+
+        intentUpdate.putExtra(EXTRA_LAT, safeLocation.getLatitude());
+        intentUpdate.putExtra(EXTRA_LON, safeLocation.getLongitude());
 
         sendBroadcast(intentUpdate);
 
@@ -161,4 +169,6 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         updateLocation(null);
     }
+
+
 }
