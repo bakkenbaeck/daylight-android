@@ -46,7 +46,7 @@
                 android:layout_height="0dp"
                 android:layout_weight="5"/>
 
-            <com.bakkenbaeck.sol.ui.view.SunView
+            <com.bakkenbaeck.sunviewlib.SunView
                 android:id="@+id/sun_view"
                 android:layout_width="match_parent"
                 android:layout_marginRight="@dimen/activity_horizontal_margin"
