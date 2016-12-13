@@ -6,10 +6,6 @@ import android.location.Location;
 import com.florianmski.suncalc.SunCalc;
 import com.florianmski.suncalc.models.SunPhase;
 
-import org.joda.time.DateTime;
-import org.joda.time.Period;
-
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -42,31 +38,38 @@ public class ThreeDayPhases {
             return this;
         }
 
-
         final double lat = location.getLatitude();
         final double lon = location.getLongitude();
 
         this.yesterdaysSunPhases = SunCalc.getPhases(this.yesterday, lat, lon);
         this.todaysSunPhases = SunCalc.getPhases(this.today, lat, lon);
         this.tomorrowsSunPhases = SunCalc.getPhases(this.tomorrow, lat, lon);
+
         return this;
     }
 
-    public Period getDayLengthChangeBetweenTodayAndYesterday() {
-        final Period todayLength = getDayLengthForPhases(this.todaysSunPhases);
-        final Period yesterdayLength = getDayLengthForPhases(this.yesterdaysSunPhases);
-        return todayLength.minus(yesterdayLength);
+    public Calendar getDayLengthChangeBetweenTodayAndYesterday2() {
+        final Calendar todayLength = getDayLengthForPhases2(this.todaysSunPhases);
+        final Calendar yesterdayLength = getDayLengthForPhases2(this.yesterdaysSunPhases);
+
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(todayLength.getTimeInMillis() - yesterdayLength.getTimeInMillis());
+
+        return c;
     }
 
-    private Period getDayLengthForPhases(final List<SunPhase> sunPhases) {
+    private Calendar getDayLengthForPhases2(final List<SunPhase> sunPhases) {
         final SunPhase sunrise = sunPhases.get(SUNRISE);
         final SunPhase sunset = sunPhases.get(SUNSET);
 
         final Date sunriseTime = sunrise.getStartDate().getTime();
         final Date sunsetTime = sunset.getEndDate().getTime();
-
         final long dayLengthInMillis = sunsetTime.getTime() - sunriseTime.getTime();
-        return new Period(dayLengthInMillis);
+
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(dayLengthInMillis);
+
+        return c;
     }
 
     public long getTomorrowsSunrise() {
@@ -76,14 +79,12 @@ public class ThreeDayPhases {
 
     public String getTodaysSunriseAsString() {
         final SunPhase sunrise = this.todaysSunPhases.get(SUNRISE);
-        final DateTime dt = new DateTime(sunrise.getStartDate());
-        return dt.toString("HH:mm");
+        return DateUtil.dateFormat("HH:mm", sunrise.getEndDate().getTime());
     }
 
     public String getTodaysSunsetAsString() {
         final SunPhase sunset = this.todaysSunPhases.get(SUNSET);
-        final DateTime dt = new DateTime(sunset.getEndDate());
-        return dt.toString("HH:mm");
+        return DateUtil.dateFormat("HH:mm", sunset.getEndDate().getTime());
     }
 
     private boolean shouldRefresh() {

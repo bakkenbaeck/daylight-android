@@ -4,7 +4,6 @@ package com.bakkenbaeck.sol.ui.view;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.Region;
 import android.graphics.Typeface;
@@ -14,29 +13,26 @@ import android.view.View;
 
 import com.bakkenbaeck.sol.R;
 
-public class SunView extends View {
-    private static final int PATH_HEIGHT = 3;
-    private int circleRadius;
-    private boolean entireSunOverHorizon;
+import java.util.Calendar;
 
-    private Paint paint;
-    private Path path;
+public class SunView extends View {
     private String startLabel;
     private String endLabel;
     private String floatingLabel;
-
-    private int textMargin;
-    private int horizont_margin;
 
     private int bottom;
     private int left;
     private int right;
     private int width;
-
+    private int textMargin;
+    private int horizon_bottom_margin;
+    private int circleRadius;
     private int availableSunHeight;
     private int availableSunWidth;
 
+    private Paint paint;
     private double[] coords;
+    private boolean entireSunOverHorizon;
 
     public SunView(final Context context) {
         super(context);
@@ -56,14 +52,29 @@ public class SunView extends View {
     private void init() {
         this.paint = new Paint();
         this.paint.setStyle(Paint.Style.FILL);
-        this.paint.setColor(ContextCompat.getColor(getContext(), R.color.daylight_text2));
         this.paint.setStrokeWidth(4);
-        this.paint.setTextSize(this.getContext().getResources().getDimensionPixelSize(R.dimen.text_size_tert));
-        this.textMargin = this.getContext().getResources().getDimensionPixelSize(R.dimen.text_margin);
-        this.horizont_margin = this.getContext().getResources().getDimensionPixelSize(R.dimen.horizont_bottom_margin);
-        this.circleRadius = this.getContext().getResources().getDimensionPixelSize(R.dimen.sun_size) / 2;
-
         this.coords = new double[]{0.0, 0.0};
+
+        initSizes();
+    }
+
+    /**
+     * Add these values to dimens.xml
+     * sun_text_margin (Margin for the floating text over the sun)
+     * sun_text_size (Default text size)
+     * sun_horizon_bottom_margin (The margin from the bottom of the view to the horizon line
+     * sun_radius (Radius of the sun)
+     *
+     * Add these values to colors.xml
+     * sun_default_color (Default color)
+     */
+    public SunView initSizes() {
+        this.paint.setColor(ContextCompat.getColor(getContext(), R.color.sun_default_color));
+        this.paint.setTextSize(this.getContext().getResources().getDimensionPixelSize(R.dimen.sun_text_size));
+        this.textMargin = this.getContext().getResources().getDimensionPixelSize(R.dimen.sun_text_margin);
+        this.horizon_bottom_margin = this.getContext().getResources().getDimensionPixelSize(R.dimen.sun_horizon_bottom_margin);
+        this.circleRadius = this.getContext().getResources().getDimensionPixelSize(R.dimen.sun_radius);
+        return this;
     }
 
     public SunView setTypeface(final Typeface typeface) {
@@ -91,7 +102,24 @@ public class SunView extends View {
         return this;
     }
 
-    // 5 == height of path
+    public SunView setTextSize(final int textSize) {
+        this.paint.setTextSize(textSize);
+        return this;
+    }
+    public SunView setFloatingTextBottomMargin(final int textMargin) {
+        this.textMargin = textMargin;
+        return this;
+    }
+
+    public SunView setSunRadius(final int radius) {
+        this.circleRadius = radius;
+        return this;
+    }
+
+    public SunView setHorizonMargin(final int margin) {
+        this.horizon_bottom_margin = margin;
+        return this;
+    }
 
     @Override
     protected void onSizeChanged(final int w, final int h, final int oldw, final int oldh) {
@@ -100,18 +128,8 @@ public class SunView extends View {
         this.left = 0;
         this.right = w;
 
-        this.availableSunHeight = h - horizont_margin - textMargin;
-        this.availableSunWidth = w - circleRadius * 2;
-
-        this.path = new Path();
-        this.path.moveTo(left + circleRadius, bottom);
-        this.path.cubicTo(
-                left + circleRadius,
-                bottom - (PATH_HEIGHT),
-                right - circleRadius,
-                bottom - (PATH_HEIGHT),
-                right - circleRadius,
-                bottom);
+        this.availableSunHeight = h - horizon_bottom_margin - textMargin;
+        this.availableSunWidth = w - (circleRadius * 4);
 
         super.onSizeChanged(w, h, oldw, oldh);
     }
@@ -119,7 +137,6 @@ public class SunView extends View {
     @Override
     protected void onDraw(final Canvas canvas) {
         super.onDraw(canvas);
-
         drawLabels(canvas);
         drawHorizontal(canvas);
         clipCanvas(canvas);
@@ -153,9 +170,9 @@ public class SunView extends View {
     private void drawHorizontal(final Canvas canvas) {
         canvas.drawLine(
                 this.left,
-                this.bottom - horizont_margin,
+                this.bottom - horizon_bottom_margin,
                 this.right,
-                this.bottom - horizont_margin,
+                this.bottom - horizon_bottom_margin,
                 this.paint);
     }
 
@@ -167,34 +184,65 @@ public class SunView extends View {
         }
     }
 
-    //Clipping for future drawing
     private void clipCanvas(final Canvas canvas) {
         canvas.clipRect(
                 0,
                 0,
                 this.width,
-                this.bottom - horizont_margin,
+                this.bottom - horizon_bottom_margin,
                 Region.Op.REPLACE);
     }
 
-    public SunView setEntireSunOverHorizon(final boolean b) {
-        this.entireSunOverHorizon = b;
-        return this;
-    }
+    /**
+     *
+     * @param startDate Start of the sunrise
+     * @param endDate End of the sunrise
+     * @param sunrise End if the sunrise (Used to hide the text when the sun is hitting the horizon)
+     * @param sunset Start of the sunset (Used to hide the text when the sun is hitting the horizon)
+     */
+    public void setProgress(final Calendar startDate, final Calendar endDate, final Calendar sunrise, final Calendar sunset) {
+        long span = endDate.getTimeInMillis() - startDate.getTimeInMillis();
+        long current = Calendar.getInstance().getTimeInMillis() - startDate.getTimeInMillis();
 
-    public void setProgress(final double xPercent, final double yPercent) {
-        this.coords = new double[]{xPercent, yPercent};
+        double progress = (double) current / (double) span;
+        double position = (Math.PI + (progress * Math.PI));
+        double x = (50 + Math.cos(position) * 50) / 100;
+        double y = (Math.abs(Math.sin(position) * 100)) / 100;
+
+        if (progress > 1 || progress < 0) {
+            x = 0;
+            y = 0;
+        }
+
+        if (sunrise != null && sunset != null) {
+            Calendar now = Calendar.getInstance();
+            entireSunOverHorizon = now.getTimeInMillis() >= sunrise.getTimeInMillis() &&
+                    now.getTimeInMillis() <= sunset.getTimeInMillis();
+        }
+
+        this.coords = new double[]{x, y};
         invalidate();
     }
 
+    /**
+     * Drawing the sun circle. Set the radius of it by adding a item in dimens.xml called sun_radius
+     * @param canvas
+     * @param coords
+     */
     private void drawCircle(final Canvas canvas, final double[] coords) {
         canvas.drawCircle(
-                (int)(coords[0] * availableSunWidth) + circleRadius,
-                (int)(this.availableSunHeight - (this.availableSunHeight * coords[1])) + circleRadius + textMargin,
+                (int)(coords[0] * availableSunWidth) + (circleRadius * 2),
+                (int)(this.availableSunHeight - (this.availableSunHeight * coords[1]))
+                        + circleRadius + textMargin,
                 circleRadius,
                 this.paint);
     }
 
+    /**
+     * Drawing the floating text over te sun view
+     * @param canvas
+     * @param coords
+     */
     private void drawFloatingLabel(final Canvas canvas, final double[] coords) {
         if (this.floatingLabel != null) {
             Rect bounds = new Rect();
@@ -205,7 +253,7 @@ public class SunView extends View {
                     bounds);
             canvas.drawText(
                     this.floatingLabel,
-                    (int)((coords[0] * availableSunWidth) - (bounds.width() / 2)) + circleRadius,
+                    (int)((coords[0] * availableSunWidth) - (bounds.width() / 2)) + (circleRadius * 2),
                     (int)((this.availableSunHeight - (this.availableSunHeight * coords[1]))
                             - (bounds.height() * 2)) + circleRadius + textMargin,
                     this.paint);

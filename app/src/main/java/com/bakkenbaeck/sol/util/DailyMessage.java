@@ -8,9 +8,7 @@ import android.support.v4.content.ContextCompat;
 import com.bakkenbaeck.sol.R;
 import com.bakkenbaeck.sol.location.CurrentCity;
 
-import org.joda.time.DateTime;
-import org.joda.time.Period;
-import org.joda.time.Seconds;
+import java.util.Calendar;
 
 public class DailyMessage {
 
@@ -24,7 +22,7 @@ public class DailyMessage {
     }
 
     public String generate(final ThreeDayPhases threeDayPhases, final Location location) {
-        final Period dayLengthChange = threeDayPhases.getDayLengthChangeBetweenTodayAndYesterday();
+        final Calendar dayLengthChange = threeDayPhases.getDayLengthChangeBetweenTodayAndYesterday2();
         final String city = getNearestCity(location);
         final String diffText = getDiffText(dayLengthChange);
         final String numMinutesText = getNumberMinutesText(dayLengthChange);
@@ -48,25 +46,23 @@ public class DailyMessage {
     }
 
     @NonNull
-    private String getDiffText(final Period dayLengthChange) {
-        final Seconds dayLengthChangeInSeconds = dayLengthChange.toStandardSeconds();
+    private String getDiffText(final Calendar dayLengthChange) {
+        final long dayLengthChangeInSeconds = dayLengthChange.getTimeInMillis() / 1000;
 
-        return
-                dayLengthChangeInSeconds.isGreaterThan(Seconds.ZERO)
-                        ? context.getResources().getString(R.string.more)
-                        : context.getResources().getString(R.string.less);
+        return dayLengthChangeInSeconds > 0
+                ? context.getResources().getString(R.string.more)
+                : context.getResources().getString(R.string.less);
     }
 
     @NonNull
-    private String getNumberMinutesText(final Period dayLengthChange) {
-        final int numMinutes =
-                Math.abs(dayLengthChange.getMinutes())
-                        + Math.abs(dayLengthChange.getSeconds()) / 30;
-        return this.context.getResources().getQuantityString(R.plurals.minutes, numMinutes, numMinutes);
+    private String getNumberMinutesText(final Calendar dayLengthChange) {
+        final double numMinutes = Math.abs((double)dayLengthChange.getTimeInMillis() / (double)(1000 * 60));
+        final int rounedMinutes = (int) Math.round(numMinutes);
+        return this.context.getResources().getQuantityString(R.plurals.minutes, rounedMinutes, rounedMinutes);
     }
 
     private String getRawMessage() {
-        final int dayOfYear = DateTime.now().dayOfYear().get();
+        final int dayOfYear = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
         final String[] allMessages = this.context.getResources().getStringArray(R.array.daily_message);
         final int messagePosition = dayOfYear % allMessages.length;
         return allMessages[messagePosition];

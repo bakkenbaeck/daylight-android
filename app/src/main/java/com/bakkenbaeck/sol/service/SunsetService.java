@@ -16,17 +16,16 @@ import android.support.v4.app.NotificationCompat;
 import android.text.Html;
 
 import com.bakkenbaeck.sol.R;
-import com.bakkenbaeck.sol.location.TimezoneMapper;
 import com.bakkenbaeck.sol.ui.SunActivity;
 import com.bakkenbaeck.sol.util.DailyMessage;
+import com.bakkenbaeck.sol.util.DateUtil;
 import com.bakkenbaeck.sol.util.SolPreferences;
 import com.bakkenbaeck.sol.util.ThreeDayPhases;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
+import java.util.Date;
 
 public class SunsetService extends Service implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
@@ -95,11 +94,9 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
 
     private void updateLocation(final Location location) {
         final Location safeLocation = storeLocation(location);
-        final String timezone = TimezoneMapper.latLngToTimezoneString(safeLocation);
-        final DateTimeZone dateTimeZone = DateTimeZone.forID(timezone);
         final ThreeDayPhases threeDayPhases = new ThreeDayPhases().init(safeLocation);
 
-        final String todaysDate = DateTime.now(dateTimeZone).toString("dd. MM. YYYY");
+        final String todaysDate = DateUtil.dateFormat("dd. MM. yyyy", new Date());
         final String currentPhaseName = threeDayPhases.getCurrentPhase().getName();
         final long tomorrowsSunrise = threeDayPhases.getTomorrowsSunrise();
 

@@ -22,13 +22,13 @@ import com.bakkenbaeck.sol.R;
 import com.bakkenbaeck.sol.databinding.ActivitySunBinding;
 import com.bakkenbaeck.sol.service.SunsetService;
 import com.bakkenbaeck.sol.util.CurrentPhase;
+import com.bakkenbaeck.sol.util.DateUtil;
 import com.bakkenbaeck.sol.util.SolPreferences;
 import com.bakkenbaeck.sol.util.SunPhaseUtil;
 import com.florianmski.suncalc.models.SunPhase;
 
-import org.joda.time.DateTime;
-
 import java.util.Calendar;
+import java.util.Date;
 
 import uk.co.chrisjenx.calligraphy.TypefaceUtils;
 
@@ -194,7 +194,7 @@ public class SunActivity extends BaseActivity {
         this.binding.sunView.setColor(ContextCompat.getColor(this, priColor));
         this.binding.sunView.setStartLabel(sunriseTime);
         this.binding.sunView.setEndLabel(sunsetTime);
-        this.binding.sunView.setFloatingLabel(DateTime.now().toString("HH:mm"));
+        this.binding.sunView.setFloatingLabel(DateUtil.dateFormat("HH:mm", new Date()));
         this.binding.title.setTextColor(ContextCompat.getColor(this, secColor));
         this.binding.sunCircle.setColorFilter(ContextCompat.getColor(this, secColor), PorterDuff.Mode.SRC);
         this.getWindow().setBackgroundDrawableResource(color);
@@ -216,33 +216,12 @@ public class SunActivity extends BaseActivity {
 
         final Calendar startDate = sunrise.getStartDate();
         final Calendar endDate = sunset.getEndDate();
-        final Calendar now = Calendar.getInstance();
-
-        long span = endDate.getTimeInMillis() - startDate.getTimeInMillis();
-        long current = Calendar.getInstance().getTimeInMillis() - startDate.getTimeInMillis();
-
-        double progress = (double) current / (double) span;
-        double position = (Math.PI + (progress * Math.PI));
-        double x = (50 + Math.cos(position) * 50) / 100;
-        double y = (Math.abs(Math.sin(position) * 100)) / 100;
-
-        if (progress > 1 || progress < 0) {
-            x = 0;
-            y = 0;
-        }
-
-        final Calendar startEndDate = sunrise.getEndDate();
-        final Calendar endStartDate = sunset.getStartDate();
-
-        boolean overHorizon = now.getTimeInMillis() >= startEndDate.getTimeInMillis() &&
-                now.getTimeInMillis() <= endStartDate.getTimeInMillis();
 
         binding.sunView.setColor(ContextCompat.getColor(this, priColor))
                 .setStartLabel(sunriseTime)
                 .setEndLabel(sunsetTime)
-                .setFloatingLabel(DateTime.now().toString("HH:mm"))
-                .setEntireSunOverHorizon(overHorizon)
-                .setProgress(x, y);
+                .setFloatingLabel(DateUtil.dateFormat("HH:mm", new Date()))
+                .setProgress(startDate, endDate, sunrise.getEndDate(), sunset.getStartDate());
 
         firstTime = false;
     }
