@@ -22,7 +22,7 @@ public class DailyMessage {
     }
 
     public String generate(final ThreeDayPhases threeDayPhases, final Location location) {
-        final Calendar dayLengthChange = threeDayPhases.getDayLengthChangeBetweenTodayAndYesterday2();
+        final Calendar dayLengthChange = threeDayPhases.getDayLengthChangeBetweenTodayAndYesterday();
         final String city = getNearestCity(location);
         final String diffText = getDiffText(dayLengthChange);
         final String numMinutesText = getNumberMinutesText(dayLengthChange);

@@ -20,7 +20,9 @@ import com.bakkenbaeck.sol.ui.SunActivity;
 import com.bakkenbaeck.sol.util.DailyMessage;
 import com.bakkenbaeck.sol.util.DateUtil;
 import com.bakkenbaeck.sol.util.SolPreferences;
+import com.bakkenbaeck.sol.util.SunPhaseUtil;
 import com.bakkenbaeck.sol.util.ThreeDayPhases;
+import com.florianmski.suncalc.models.SunPhase;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -41,6 +43,11 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
 
     public static final String EXTRA_LAT = "extra_lat";
     public static final String EXTRA_LON = "extra_lon";
+
+    public static final String SUNRISE_START = "sunrise_start";
+    public static final String SUNRISE_END = "sunrise_end";
+    public static final String SUNSET_START = "sunset_start";
+    public static final String SUNSET_END = "sunset_end";
 
     private GoogleApiClient googleApiClient;
     private DailyMessage dailyMessage;
@@ -103,6 +110,9 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
         final String todaysMessage = this.dailyMessage.generate(threeDayPhases, safeLocation);
         final String locationMessage = this.dailyMessage.getLocation(safeLocation.getLatitude(), safeLocation.getLongitude());
 
+        SunPhase sunrise = SunPhaseUtil.getSunPhase(location.getLatitude(), location.getLongitude(), "Sunrise");
+        SunPhase sunset = SunPhaseUtil.getSunPhase(location.getLatitude(), location.getLongitude(), "Sunset");
+
         final Intent intentUpdate = new Intent();
         intentUpdate.setAction(ACTION_UPDATE);
         intentUpdate.addCategory(Intent.CATEGORY_DEFAULT);
@@ -115,6 +125,13 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
 
         intentUpdate.putExtra(EXTRA_LAT, safeLocation.getLatitude());
         intentUpdate.putExtra(EXTRA_LON, safeLocation.getLongitude());
+
+        Bundle b = new Bundle();
+        b.putSerializable(SUNRISE_START, sunrise.getStartDate().getTime());
+        b.putSerializable(SUNRISE_END, sunrise.getEndDate().getTime());
+        b.putSerializable(SUNSET_START, sunset.getStartDate().getTime());
+        b.putSerializable(SUNSET_END, sunset.getEndDate().getTime());
+        intentUpdate.putExtras(b);
 
         sendBroadcast(intentUpdate);
 

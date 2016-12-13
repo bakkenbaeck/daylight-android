@@ -48,9 +48,9 @@ public class ThreeDayPhases {
         return this;
     }
 
-    public Calendar getDayLengthChangeBetweenTodayAndYesterday2() {
-        final Calendar todayLength = getDayLengthForPhases2(this.todaysSunPhases);
-        final Calendar yesterdayLength = getDayLengthForPhases2(this.yesterdaysSunPhases);
+    public Calendar getDayLengthChangeBetweenTodayAndYesterday() {
+        final Calendar todayLength = getDayLengthForPhases(this.todaysSunPhases);
+        final Calendar yesterdayLength = getDayLengthForPhases(this.yesterdaysSunPhases);
 
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(todayLength.getTimeInMillis() - yesterdayLength.getTimeInMillis());
@@ -58,7 +58,7 @@ public class ThreeDayPhases {
         return c;
     }
 
-    private Calendar getDayLengthForPhases2(final List<SunPhase> sunPhases) {
+    private Calendar getDayLengthForPhases(final List<SunPhase> sunPhases) {
         final SunPhase sunrise = sunPhases.get(SUNRISE);
         final SunPhase sunset = sunPhases.get(SUNSET);
 

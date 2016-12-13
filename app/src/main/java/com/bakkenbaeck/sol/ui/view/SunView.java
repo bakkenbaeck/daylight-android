@@ -14,6 +14,7 @@ import android.view.View;
 import com.bakkenbaeck.sol.R;
 
 import java.util.Calendar;
+import java.util.Date;
 
 public class SunView extends View {
     private String startLabel;
@@ -32,7 +33,11 @@ public class SunView extends View {
 
     private Paint paint;
     private double[] coords;
+
     private boolean entireSunOverHorizon;
+    private boolean showStartLabel;
+    private boolean showEndLabel;
+    private boolean showFloatingLabel;
 
     public SunView(final Context context) {
         super(context);
@@ -121,6 +126,11 @@ public class SunView extends View {
         return this;
     }
 
+    public SunView showFloatingLabel(final boolean showFloatingLabel) {
+        this.showFloatingLabel = showFloatingLabel;
+        return this;
+    }
+
     @Override
     protected void onSizeChanged(final int w, final int h, final int oldw, final int oldh) {
         this.width = w;
@@ -144,7 +154,7 @@ public class SunView extends View {
     }
 
     private void drawLabels(final Canvas canvas) {
-        if (this.startLabel != null) {
+        if (this.startLabel != null && showStartLabel) {
             canvas.drawText(
                     this.startLabel,
                     this.left,
@@ -152,7 +162,7 @@ public class SunView extends View {
                     this.paint);
         }
 
-        if (this.endLabel != null) {
+        if (this.endLabel != null && showEndLabel) {
             Rect bounds = new Rect();
             this.paint.getTextBounds(
                     this.endLabel,
@@ -179,7 +189,7 @@ public class SunView extends View {
     private void drawSun(Canvas canvas){
         drawCircle(canvas, coords);
 
-        if (entireSunOverHorizon) {
+        if (entireSunOverHorizon && showFloatingLabel) {
             drawFloatingLabel(canvas, coords);
         }
     }
@@ -193,6 +203,42 @@ public class SunView extends View {
                 Region.Op.REPLACE);
     }
 
+    public SunView showStartTime(final boolean show) {
+        this.showStartLabel = show;
+        return this;
+    }
+
+    public SunView showEndTime(final boolean show) {
+        this.showEndLabel = show;
+        return this;
+    }
+
+    public SunView showStartAndEndTime(final boolean startShow, final boolean endShow) {
+        this.showStartLabel = startShow;
+        this.showEndLabel = endShow;
+        return this;
+    }
+
+    /**
+     * Progess is between 0 and 1 [0,1]
+     * @param progress
+     */
+    public SunView setPercentProgress(final double progress) {
+        double position = (Math.PI + (progress * Math.PI));
+        double x = (50 + Math.cos(position) * 50) / 100;
+        double y = (Math.abs(Math.sin(position) * 100)) / 100;
+
+        if (progress > 1 || progress < 0) {
+            x = 0;
+            y = 0;
+        }
+
+        this.coords = new double[]{x, y};
+        invalidate();
+
+        return this;
+    }
+
     /**
      *
      * @param startDate Start of the sunrise
@@ -200,9 +246,9 @@ public class SunView extends View {
      * @param sunrise End if the sunrise (Used to hide the text when the sun is hitting the horizon)
      * @param sunset Start of the sunset (Used to hide the text when the sun is hitting the horizon)
      */
-    public void setProgress(final Calendar startDate, final Calendar endDate, final Calendar sunrise, final Calendar sunset) {
-        long span = endDate.getTimeInMillis() - startDate.getTimeInMillis();
-        long current = Calendar.getInstance().getTimeInMillis() - startDate.getTimeInMillis();
+    public void setDateProgress(final Date startDate, final Date endDate, final Date sunrise, final Date sunset) {
+        long span = endDate.getTime() - startDate.getTime();
+        long current = Calendar.getInstance().getTimeInMillis() - startDate.getTime();
 
         double progress = (double) current / (double) span;
         double position = (Math.PI + (progress * Math.PI));
@@ -216,8 +262,8 @@ public class SunView extends View {
 
         if (sunrise != null && sunset != null) {
             Calendar now = Calendar.getInstance();
-            entireSunOverHorizon = now.getTimeInMillis() >= sunrise.getTimeInMillis() &&
-                    now.getTimeInMillis() <= sunset.getTimeInMillis();
+            entireSunOverHorizon = now.getTimeInMillis() >= sunrise.getTime() &&
+                    now.getTimeInMillis() <= sunset.getTime();
         }
 
         this.coords = new double[]{x, y};

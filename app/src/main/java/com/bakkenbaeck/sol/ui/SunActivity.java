@@ -24,10 +24,7 @@ import com.bakkenbaeck.sol.service.SunsetService;
 import com.bakkenbaeck.sol.util.CurrentPhase;
 import com.bakkenbaeck.sol.util.DateUtil;
 import com.bakkenbaeck.sol.util.SolPreferences;
-import com.bakkenbaeck.sol.util.SunPhaseUtil;
-import com.florianmski.suncalc.models.SunPhase;
 
-import java.util.Calendar;
 import java.util.Date;
 
 import uk.co.chrisjenx.calligraphy.TypefaceUtils;
@@ -129,10 +126,13 @@ public class SunActivity extends BaseActivity {
             final String locationMessage = intent.getStringExtra(SunsetService.EXTRA_LOCATION_MESSAGE);
             final CurrentPhase currentPhase = new CurrentPhase(intent.getStringExtra(SunsetService.EXTRA_CURRENT_PHASE));
 
-            double lat = intent.getDoubleExtra(SunsetService.EXTRA_LAT, 0);
-            double lon = intent.getDoubleExtra(SunsetService.EXTRA_LON, 0);
+            final Date sunriseStart = (Date) intent.getExtras().getSerializable(SunsetService.SUNRISE_START);
+            final Date sunriseEnd = (Date) intent.getExtras().getSerializable(SunsetService.SUNRISE_END);
+            final Date sunsetStart = (Date) intent.getExtras().getSerializable(SunsetService.SUNSET_START);
+            final Date sunsetEnd = (Date) intent.getExtras().getSerializable(SunsetService.SUNSET_END);
 
-            updateView(todaysMessageFormatted, sunriseTime, sunsetTime, locationMessage, currentPhase, lat, lon);
+            updateView(todaysMessageFormatted, sunriseTime, sunsetTime, locationMessage,
+                    currentPhase, sunriseStart, sunriseEnd, sunsetStart, sunsetEnd);
         }
 
         private Spanned convertToHtml(final String message) {
@@ -150,8 +150,10 @@ public class SunActivity extends BaseActivity {
                             final String sunsetTime,
                             final String locationMessage,
                             final CurrentPhase currentPhase,
-                            final double lat,
-                            final double lon) {
+                            final Date sunriseStart,
+                            final Date sunriseEnd,
+                            final Date sunsetStart,
+                            final Date sunsetEnd) {
 
         if (this.binding == null) {
             return;
@@ -210,18 +212,13 @@ public class SunActivity extends BaseActivity {
 
         updateInfoViewIfAttached(currentPhase.getName());
 
-        // Calc current position in the sun view
-        SunPhase sunrise = SunPhaseUtil.getSunPhase(lat, lon, "Sunrise");
-        SunPhase sunset = SunPhaseUtil.getSunPhase(lat, lon, "Sunset");
-
-        final Calendar startDate = sunrise.getStartDate();
-        final Calendar endDate = sunset.getEndDate();
-
         binding.sunView.setColor(ContextCompat.getColor(this, priColor))
                 .setStartLabel(sunriseTime)
                 .setEndLabel(sunsetTime)
                 .setFloatingLabel(DateUtil.dateFormat("HH:mm", new Date()))
-                .setProgress(startDate, endDate, sunrise.getEndDate(), sunset.getStartDate());
+                .showStartAndEndTime(true, true)
+                .showFloatingLabel(true)
+                .setDateProgress(sunriseStart, sunsetEnd, sunriseEnd, sunsetStart);
 
         firstTime = false;
     }
