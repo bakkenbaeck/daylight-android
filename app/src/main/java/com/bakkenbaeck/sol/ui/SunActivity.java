@@ -19,7 +19,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.text.Html;
 import android.text.Spanned;
-import android.util.Log;
 import android.view.View;
 
 import com.bakkenbaeck.sol.R;
@@ -228,7 +227,7 @@ public class SunActivity extends BaseActivity {
                 .setFloatingLabel(DateUtil.dateFormat("HH:mm", new Date()))
                 .showStartAndEndTime(true, true)
                 .showFloatingLabel(true)
-                .setDateProgress(sunriseStart, sunsetEnd, sunriseEnd, sunsetStart);
+                .setDateProgress(sunriseStart, sunsetEnd);
 
         firstTime = false;
     }
