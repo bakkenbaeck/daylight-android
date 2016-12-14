@@ -80,7 +80,7 @@ public class ThreeDayPhases {
 
     public String getTodaysSunriseAsString() {
         final SunPhase sunrise = this.todaysSunPhases.get(SUNRISE);
-        return DateUtil.dateFormat("HH:mm", sunrise.getEndDate().getTime());
+        return DateUtil.dateFormat("HH:mm", sunrise.getStartDate().getTime());
     }
 
     public String getTodaysSunsetAsString() {
