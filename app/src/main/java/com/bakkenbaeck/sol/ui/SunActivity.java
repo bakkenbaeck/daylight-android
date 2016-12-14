@@ -19,6 +19,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.text.Html;
 import android.text.Spanned;
+import android.util.Log;
 import android.view.View;
 
 import com.bakkenbaeck.sol.R;
@@ -90,11 +91,16 @@ public class SunActivity extends BaseActivity {
     private void showInfo(final String phaseName) {
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
+        InfoFragment fragment = (InfoFragment) fm.findFragmentByTag(InfoFragment.TAG);
 
-        ft.add(R.id.container, InfoFragment.newInstance(phaseName), InfoFragment.TAG)
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                .addToBackStack(InfoFragment.TAG)
-                .commit();
+        if (fragment == null) {
+            ft.add(R.id.container, InfoFragment.newInstance(phaseName), InfoFragment.TAG)
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                    .addToBackStack(InfoFragment.TAG)
+                    .commit();
+        } else {
+            fragment.update(phaseName);
+        }
     }
 
     @Override
@@ -146,7 +152,6 @@ public class SunActivity extends BaseActivity {
             }
         }
     }
-
 
     private void updateView(final Spanned todaysText,
                             final String sunriseTime,
@@ -208,14 +213,12 @@ public class SunActivity extends BaseActivity {
 
         animateBackground(colorFrom, colorTo);
 
-        if (!this.binding.titleWrapper.hasOnClickListeners()) {
-            this.binding.titleWrapper.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    showInfo(currentPhase.getName());
-                }
-            });
-        }
+        this.binding.titleWrapper.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showInfo(currentPhase.getName());
+            }
+        });
 
         updateInfoViewIfAttached(currentPhase.getName());
 

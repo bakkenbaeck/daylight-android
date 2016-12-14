@@ -27,7 +27,6 @@ public class InfoFragment extends Fragment {
     private String phaseName;
 
     public static InfoFragment newInstance(final String phaseName) {
-        Log.d(TAG, "newInstance: " + phaseName);
         Bundle b = new Bundle();
         b.putString(PHASE_NAME, phaseName);
         InfoFragment f = new InfoFragment();
