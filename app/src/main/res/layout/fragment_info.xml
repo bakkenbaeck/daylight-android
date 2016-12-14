@@ -22,9 +22,9 @@
 
             <ImageView
                 android:id="@+id/sun_circle"
-                android:layout_width="@dimen/sun_size"
-                android:layout_height="@dimen/sun_size"
-                android:src="@drawable/circle"/>
+                android:layout_width="16dp"
+                android:scaleType="fitStart"
+                android:layout_height="@dimen/sun_size" />
 
             <TextView
                 android:id="@+id/title"
