@@ -1,6 +1,8 @@
 package com.bakkenbaeck.sol.ui;
 
 import android.Manifest;
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +10,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -186,7 +189,6 @@ public class SunActivity extends BaseActivity {
         }
 
         this.binding.todaysMessage.setText(todaysText);
-        this.binding.activitySun.setBackgroundColor(ContextCompat.getColor(this, color));
         this.binding.todaysMessage.setTextColor(ContextCompat.getColor(this, secColor));
         this.binding.location.setTextColor(ContextCompat.getColor(this, secColor));
 
@@ -200,6 +202,11 @@ public class SunActivity extends BaseActivity {
         this.binding.title.setTextColor(ContextCompat.getColor(this, secColor));
         this.binding.sunCircle.setColorFilter(ContextCompat.getColor(this, secColor), PorterDuff.Mode.SRC);
         this.getWindow().setBackgroundDrawableResource(color);
+
+        int colorFrom = ((ColorDrawable) this.binding.activitySun.getBackground()).getColor();
+        int colorTo = ContextCompat.getColor(this, color);
+
+        animateBackground(colorFrom, colorTo);
 
         if (!this.binding.titleWrapper.hasOnClickListeners()) {
             this.binding.titleWrapper.setOnClickListener(new View.OnClickListener() {
@@ -221,6 +228,27 @@ public class SunActivity extends BaseActivity {
                 .setDateProgress(sunriseStart, sunsetEnd, sunriseEnd, sunsetStart);
 
         firstTime = false;
+    }
+
+    private void animateBackground(final int colorFrom, final int colorTo) {
+        if (colorFrom == colorTo) {
+            return;
+        }
+
+        ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
+        colorAnimation.setDuration(400);
+        colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animator) {
+                if (binding == null) {
+                    return;
+                }
+                int color = (int) animator.getAnimatedValue();
+                binding.activitySun.setBackgroundColor(color);
+            }
+
+        });
+        colorAnimation.start();
     }
 
     @Override

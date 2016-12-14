@@ -3,16 +3,17 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <FrameLayout
+        android:id="@+id/activity_sun"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:paddingTop="24dp"
+        android:background="@color/daylight">
 
         <LinearLayout
-            android:id="@+id/activity_sun"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            tools:context="com.bakkenbaeck.sol.ui.SunActivity"
-            android:background="@color/daylight">
+            tools:context="com.bakkenbaeck.sol.ui.SunActivity">
 
             <LinearLayout
                 android:id="@+id/title_wrapper"
