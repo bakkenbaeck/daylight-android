@@ -135,12 +135,10 @@ public class SunActivity extends BaseActivity {
             final CurrentPhase currentPhase = new CurrentPhase(intent.getStringExtra(SunsetService.EXTRA_CURRENT_PHASE));
 
             final Date sunriseStart = (Date) intent.getExtras().getSerializable(SunsetService.SUNRISE_START);
-            final Date sunriseEnd = (Date) intent.getExtras().getSerializable(SunsetService.SUNRISE_END);
-            final Date sunsetStart = (Date) intent.getExtras().getSerializable(SunsetService.SUNSET_START);
             final Date sunsetEnd = (Date) intent.getExtras().getSerializable(SunsetService.SUNSET_END);
 
             updateView(todaysMessageFormatted, sunriseTime, sunsetTime, locationMessage,
-                    currentPhase, sunriseStart, sunriseEnd, sunsetStart, sunsetEnd);
+                    currentPhase, sunriseStart, sunsetEnd);
         }
 
         private Spanned convertToHtml(final String message) {
@@ -158,8 +156,6 @@ public class SunActivity extends BaseActivity {
                             final String locationMessage,
                             final CurrentPhase currentPhase,
                             final Date sunriseStart,
-                            final Date sunriseEnd,
-                            final Date sunsetStart,
                             final Date sunsetEnd) {
 
         if (this.binding == null) {

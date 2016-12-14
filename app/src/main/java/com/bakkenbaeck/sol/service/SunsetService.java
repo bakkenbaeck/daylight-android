@@ -45,8 +45,6 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
     public static final String EXTRA_LON = "extra_lon";
 
     public static final String SUNRISE_START = "sunrise_start";
-    public static final String SUNRISE_END = "sunrise_end";
-    public static final String SUNSET_START = "sunset_start";
     public static final String SUNSET_END = "sunset_end";
 
     private GoogleApiClient googleApiClient;
@@ -110,8 +108,8 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
         final String todaysMessage = this.dailyMessage.generate(threeDayPhases);
         final String locationMessage = this.dailyMessage.getLocation(safeLocation.getLatitude(), safeLocation.getLongitude());
 
-        SunPhase sunrise = SunPhaseUtil.getSunPhase(location.getLatitude(), location.getLongitude(), "Sunrise");
-        SunPhase sunset = SunPhaseUtil.getSunPhase(location.getLatitude(), location.getLongitude(), "Sunset");
+        final SunPhase sunrise = SunPhaseUtil.getSunPhase(safeLocation.getLatitude(), safeLocation.getLongitude(), "Sunrise");
+        final SunPhase sunset = SunPhaseUtil.getSunPhase(safeLocation.getLatitude(), safeLocation.getLongitude(), "Sunset");
 
         final Intent intentUpdate = new Intent();
         intentUpdate.setAction(ACTION_UPDATE);
@@ -128,8 +126,6 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
 
         Bundle b = new Bundle();
         b.putSerializable(SUNRISE_START, sunrise.getStartDate().getTime());
-        b.putSerializable(SUNRISE_END, sunrise.getEndDate().getTime());
-        b.putSerializable(SUNSET_START, sunset.getStartDate().getTime());
         b.putSerializable(SUNSET_END, sunset.getEndDate().getTime());
         intentUpdate.putExtras(b);
 

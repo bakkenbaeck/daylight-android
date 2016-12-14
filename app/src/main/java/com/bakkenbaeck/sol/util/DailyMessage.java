@@ -28,7 +28,7 @@ public class DailyMessage {
         final boolean moreOrLess = getDiff(dayLengthChange);
         final int primaryColor = phase.getPrimaryColor();
 
-        final String numMinutesText = getNumberMinutesText(dayLengthChange);
+        final int minutes = getNumberMinutesText(dayLengthChange);
         final String phaseName = phase.getName();
         final String nightPhase = SunPhase.all().get(ThreeDayPhases.NIGHT).getName().toString();
 
@@ -47,9 +47,14 @@ public class DailyMessage {
         final Random ran = new Random();
         final int ranInt = ran.nextInt(messageArray.length);
 
+        String plural = minutes > 1
+                ? context.getResources().getString(R.string.minutes)
+                : context.getResources().getString(R.string.minute);
+
         return messageArray[ranInt]
                 .replace("{color}", String.valueOf(ContextCompat.getColor(context, primaryColor)))
-                .replace("{numMinutes}", numMinutesText);
+                .replace("{numMinutes}", String.valueOf(minutes))
+                .replace("{minutes}", plural);
     }
 
     public String getLocation(final double latitude, final double longitude) {
@@ -63,9 +68,9 @@ public class DailyMessage {
     }
 
     @NonNull
-    private String getNumberMinutesText(final Calendar dayLengthChange) {
+    private int getNumberMinutesText(final Calendar dayLengthChange) {
         final double numMinutes = Math.abs((double)dayLengthChange.getTimeInMillis() / (double)(1000 * 60));
         final int rounedMinutes = (int) Math.round(numMinutes);
-        return this.context.getResources().getQuantityString(R.plurals.minutes, rounedMinutes, rounedMinutes);
+        return rounedMinutes;
     }
 }
