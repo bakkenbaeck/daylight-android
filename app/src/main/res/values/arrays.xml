@@ -3,4 +3,24 @@
     <string-array name="daily_message">
         <item><![CDATA[Today, <font color={color}>{city}</font> has <font color={color}>{numMinutes}</font> {moreOrLess} sunlight than yesterday.]]></item>
     </string-array>
+
+    <string-array name="daily_messages_positive">
+        <item><![CDATA[Today, <font color={color}>you have {numMinutes}</font> more sunlight than yesterday. Enjoy!]]></item>
+        <item><![CDATA[You\'ve got <font color={color}>{numMinutes} more minutes</font> of sunlight today. How will you spend them?]]></item>
+        <item><![CDATA[Happy days, this day is <font color={color}>{numMinutes} minutes</font> longer than yesterday. Will you make it count?]]></item>
+        <item><![CDATA[Today brings you <font color={color}>{numMinutes} extra minutes</font> of daylight. Enjoy it while it\'s there!]]></item>
+        <item><![CDATA[You know what? You can enjoy <font color={color}>{numMinutes} more minutes</font> of daylight today!]]></item>
+    </string-array>
+
+    <string-array name="daily_messages_negative">
+        <item><![CDATA[Buu, today it\'s <font color={color}>{numMinutes} less</font> sunlight than yesterday.]]></item>
+    </string-array>
+
+    <string-array name="night_messages_posivite">
+        <item><![CDATA[The sun has set, but don\'t worry. Tomorrow there is <font color={color}>{numMinutes} more bright minutes</font> for you.]]></item>
+    </string-array>
+
+    <string-array name="night_messages_negative">
+        <item><![CDATA[The sun has set, and that\'s sad. Tomorrow there is <font color={color}>{numMinutes} less bright minutes</font>]]></item>
+    </string-array>
 </resources>

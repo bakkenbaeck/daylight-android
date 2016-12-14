@@ -107,7 +107,7 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
         final String currentPhaseName = threeDayPhases.getCurrentPhase().getName();
         final long tomorrowsSunrise = threeDayPhases.getTomorrowsSunrise();
 
-        final String todaysMessage = this.dailyMessage.generate(threeDayPhases, safeLocation);
+        final String todaysMessage = this.dailyMessage.generate(threeDayPhases);
         final String locationMessage = this.dailyMessage.getLocation(safeLocation.getLatitude(), safeLocation.getLongitude());
 
         SunPhase sunrise = SunPhaseUtil.getSunPhase(location.getLatitude(), location.getLongitude(), "Sunrise");

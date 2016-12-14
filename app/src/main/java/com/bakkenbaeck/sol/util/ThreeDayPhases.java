@@ -12,6 +12,7 @@ import java.util.List;
 
 public class ThreeDayPhases {
 
+    public final static int NIGHT = 1;
     private final static int SUNRISE = 4;
     private final static int SUNSET = 8;
 
