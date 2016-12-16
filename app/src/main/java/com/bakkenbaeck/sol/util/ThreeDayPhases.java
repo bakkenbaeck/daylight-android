@@ -12,7 +12,7 @@ import java.util.List;
 
 public class ThreeDayPhases {
 
-    public final static int NIGHT = 1;
+    public final static int NIGHT = 12;
     private final static int SUNRISE = 4;
     private final static int SUNSET = 8;
 
@@ -55,6 +55,16 @@ public class ThreeDayPhases {
 
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(todayLength.getTimeInMillis() - yesterdayLength.getTimeInMillis());
+
+        return c;
+    }
+
+    public Calendar getDayLengthChangeBetweenTodayAndTomorrow() {
+        final Calendar todayLength = getDayLengthForPhases(this.todaysSunPhases);
+        final Calendar tomorrowLength = getDayLengthForPhases(this.tomorrowsSunPhases);
+
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(tomorrowLength.getTimeInMillis() - todayLength.getTimeInMillis());
 
         return c;
     }

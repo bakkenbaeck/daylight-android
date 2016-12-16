@@ -51,6 +51,7 @@
             android:textColor="@color/daylight_text"
             android:layout_marginTop="48dp"
             android:layout_marginBottom="16dp"
+            android:letterSpacing="-.04"
             android:layout_marginLeft="@dimen/activity_vertical_margin"
             android:layout_marginRight="@dimen/activity_vertical_margin" />
 
@@ -82,4 +83,5 @@
 
         </LinearLayout>
     </LinearLayout>
+
 </layout>

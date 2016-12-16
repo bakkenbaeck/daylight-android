@@ -64,6 +64,7 @@
                 android:textColor="@color/daylight_text"
                 android:layout_marginTop="48dp"
                 android:layout_marginBottom="16dp"
+                android:letterSpacing="-.04"
                 android:layout_marginLeft="@dimen/activity_vertical_margin"
                 android:layout_marginRight="@dimen/activity_vertical_margin"
                 android:alpha="0"/>
@@ -95,7 +96,8 @@
                     android:layout_marginLeft="@dimen/activity_vertical_margin"
                     android:layout_marginRight="@dimen/activity_vertical_margin"
                     android:text="@string/share"
-                    android:alpha="0"/>
+                    android:alpha="0"
+                    android:visibility="gone"/>
 
             </FrameLayout>
         </LinearLayout>
@@ -106,4 +108,5 @@
             android:layout_height="match_parent"/>
 
     </FrameLayout>
+
 </layout>
