@@ -12,9 +12,9 @@ import java.util.List;
 
 public class ThreeDayPhases {
 
-    public final static int NIGHT = 12;
     private final static int SUNRISE = 4;
     private final static int SUNSET = 8;
+    public final static int NIGHT = 12;
 
     private final Calendar today;
     private final Calendar tomorrow;
@@ -53,7 +53,7 @@ public class ThreeDayPhases {
         final Calendar todayLength = getDayLengthForPhases(this.todaysSunPhases);
         final Calendar yesterdayLength = getDayLengthForPhases(this.yesterdaysSunPhases);
 
-        Calendar c = Calendar.getInstance();
+        final Calendar c = Calendar.getInstance();
         c.setTimeInMillis(todayLength.getTimeInMillis() - yesterdayLength.getTimeInMillis());
 
         return c;
@@ -63,7 +63,7 @@ public class ThreeDayPhases {
         final Calendar todayLength = getDayLengthForPhases(this.todaysSunPhases);
         final Calendar tomorrowLength = getDayLengthForPhases(this.tomorrowsSunPhases);
 
-        Calendar c = Calendar.getInstance();
+        final Calendar c = Calendar.getInstance();
         c.setTimeInMillis(tomorrowLength.getTimeInMillis() - todayLength.getTimeInMillis());
 
         return c;
@@ -77,7 +77,7 @@ public class ThreeDayPhases {
         final Date sunsetTime = sunset.getEndDate().getTime();
         final long dayLengthInMillis = sunsetTime.getTime() - sunriseTime.getTime();
 
-        Calendar c = Calendar.getInstance();
+        final Calendar c = Calendar.getInstance();
         c.setTimeInMillis(dayLengthInMillis);
 
         return c;
@@ -88,14 +88,14 @@ public class ThreeDayPhases {
         return sunrise.getStartDate().getTime().getTime();
     }
 
-    public String getTodaysSunriseAsString() {
+    public long getTodaysSunriseAsLong() {
         final SunPhase sunrise = this.todaysSunPhases.get(SUNRISE);
-        return DateUtil.dateFormat("HH:mm", sunrise.getStartDate().getTime());
+        return sunrise.getStartDate().getTimeInMillis();
     }
 
-    public String getTodaysSunsetAsString() {
+    public long getTodaysSunsetAsLong() {
         final SunPhase sunset = this.todaysSunPhases.get(SUNSET);
-        return DateUtil.dateFormat("HH:mm", sunset.getEndDate().getTime());
+        return sunset.getEndDate().getTimeInMillis();
     }
 
     private boolean shouldRefresh() {

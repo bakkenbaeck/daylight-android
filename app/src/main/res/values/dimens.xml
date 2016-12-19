@@ -11,4 +11,5 @@
     <dimen name="sun_size">16dp</dimen>
     <dimen name="sun_radius">8dp</dimen>
     <dimen name="sun_text_size">12sp</dimen>
+    <dimen name="sun_stroke_width">1dp</dimen>
 </resources>

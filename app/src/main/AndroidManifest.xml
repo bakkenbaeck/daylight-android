@@ -13,13 +13,18 @@
         android:theme="@style/AppTheme"
         android:name=".BaseApplication">
         <activity android:name=".ui.SunActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".ui.InfoActivity"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTask"/>
 
         <receiver
             android:name=".service.BootReceiver"

@@ -14,8 +14,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.text.Html;
 import android.text.Spanned;
@@ -24,11 +22,13 @@ import android.view.View;
 import com.bakkenbaeck.sol.R;
 import com.bakkenbaeck.sol.databinding.ActivitySunBinding;
 import com.bakkenbaeck.sol.service.SunsetService;
+import com.bakkenbaeck.sol.service.TimeReceiver;
 import com.bakkenbaeck.sol.util.CurrentPhase;
-import com.bakkenbaeck.sol.util.DateUtil;
-import com.bakkenbaeck.sol.util.SolPreferences;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import uk.co.chrisjenx.calligraphy.TypefaceUtils;
 
@@ -49,14 +49,6 @@ public class SunActivity extends BaseActivity {
         checkForLocationPermission();
     }
 
-    private void checkForLocationPermission() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_CODE);
-        } else {
-            startLocationService();
-        }
-    }
-
     private void init() {
         this.binding = DataBindingUtil.setContentView(this, R.layout.activity_sun);
         this.sunsetBroadcastReceiver = new SunsetBroadcastReceiver();
@@ -65,57 +57,27 @@ public class SunActivity extends BaseActivity {
         registerTimeReceiver();
     }
 
+    private void checkForLocationPermission() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_CODE);
+        } else {
+            startLocationService();
+        }
+    }
+
     private void registerTimeReceiver() {
         this.timeReceiver = new TimeReceiver();
         this.registerReceiver(this.timeReceiver, new IntentFilter(Intent.ACTION_TIME_TICK));
     }
 
-    private class TimeReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            startLocationService();
-        }
-    }
-
-    private void updateInfoViewIfAttached(final String phaseName) {
-        InfoFragment f = (InfoFragment) getSupportFragmentManager().findFragmentByTag(InfoFragment.TAG);
-
-        if (f == null) {
-            return;
-        }
-
-        f.update(phaseName);
-    }
-
-    private void showInfo(final String phaseName) {
-        FragmentManager fm = getSupportFragmentManager();
-        FragmentTransaction ft = fm.beginTransaction();
-        InfoFragment fragment = (InfoFragment) fm.findFragmentByTag(InfoFragment.TAG);
-
-        if (fragment == null) {
-            ft.add(R.id.container, InfoFragment.newInstance(phaseName), InfoFragment.TAG)
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                    .addToBackStack(InfoFragment.TAG)
-                    .commit();
-        } else {
-            fragment.update(phaseName);
-        }
-    }
-
     @Override
     public void onRequestPermissionsResult(final int requestCode, @NonNull final String[] permissions,
                                            @NonNull final int[] grantResults) {
-        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            startLocationService();
-        } else {
-            startLocationService();
-        }
+        startLocationService();
     }
 
     private void startLocationService() {
         final Intent serviceIntent = new Intent(this, SunsetService.class);
-        SolPreferences solPrefs = new SolPreferences(this);
-        serviceIntent.putExtra(SunsetService.EXTRA_SHOW_NOTIFICATION, solPrefs.getShowNotification());
         startService(serviceIntent);
 
         final IntentFilter intentFilter = new IntentFilter(SunsetService.ACTION_UPDATE);
@@ -126,19 +88,20 @@ public class SunActivity extends BaseActivity {
     private class SunsetBroadcastReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(final Context context, final Intent intent) {
-            final String todaysMessage = intent.getStringExtra( SunsetService.EXTRA_DAILY_MESSAGE);
+            final String todaysMessage = intent.getStringExtra(SunsetService.EXTRA_DAILY_MESSAGE);
             final Spanned todaysMessageFormatted = convertToHtml(todaysMessage);
 
-            final String sunriseTime = intent.getStringExtra(SunsetService.EXTRA_SUNRISE_TIME);
-            final String sunsetTime = intent.getStringExtra(SunsetService.EXTRA_SUNSET_TIME);
+            final long sunriseTime = intent.getLongExtra(SunsetService.EXTRA_SUNRISE_TIME, 0);
+            final long sunsetTime = intent.getLongExtra(SunsetService.EXTRA_SUNSET_TIME, 0);
             final String locationMessage = intent.getStringExtra(SunsetService.EXTRA_LOCATION_MESSAGE);
             final CurrentPhase currentPhase = new CurrentPhase(intent.getStringExtra(SunsetService.EXTRA_CURRENT_PHASE));
 
-            final Date sunriseStart = (Date) intent.getExtras().getSerializable(SunsetService.SUNRISE_START);
-            final Date sunsetEnd = (Date) intent.getExtras().getSerializable(SunsetService.SUNSET_END);
+            final SimpleDateFormat sdf = new SimpleDateFormat(getString(R.string.hh_mm), Locale.getDefault());
+            final String sunriseText = sdf.format(sunriseTime);
+            final String sunsetText = sdf.format(sunsetTime);
 
-            updateView(todaysMessageFormatted, sunriseTime, sunsetTime, locationMessage,
-                    currentPhase, sunriseStart, sunsetEnd);
+            updateView(todaysMessageFormatted, sunriseText, sunsetText, locationMessage,
+                    currentPhase, sunriseTime, sunsetTime);
         }
 
         private Spanned convertToHtml(final String message) {
@@ -155,8 +118,8 @@ public class SunActivity extends BaseActivity {
                             final String sunsetTime,
                             final String locationMessage,
                             final CurrentPhase currentPhase,
-                            final Date sunriseStart,
-                            final Date sunsetEnd) {
+                            final long sunriseStart,
+                            final long sunsetEnd) {
 
         if (this.binding == null) {
             return;
@@ -165,6 +128,8 @@ public class SunActivity extends BaseActivity {
         final int color = currentPhase.getBackgroundColor();
         final int secColor = currentPhase.getSecondaryColor();
         final int priColor = currentPhase.getPrimaryColor();
+
+        final SimpleDateFormat sdf = new SimpleDateFormat(getString(R.string.hh_mm), Locale.getDefault());
 
         if (this.firstTime) {
             this.binding.todaysMessage.animate()
@@ -198,34 +163,39 @@ public class SunActivity extends BaseActivity {
         this.binding.sunView.setColor(ContextCompat.getColor(this, priColor));
         this.binding.sunView.setStartLabel(sunriseTime);
         this.binding.sunView.setEndLabel(sunsetTime);
-        this.binding.sunView.setFloatingLabel(DateUtil.dateFormat("HH:mm", new Date()));
         this.binding.title.setTextColor(ContextCompat.getColor(this, secColor));
         this.binding.sunCircle.setColorFilter(ContextCompat.getColor(this, secColor), PorterDuff.Mode.SRC);
-        this.getWindow().setBackgroundDrawableResource(color);
+        this.binding.sunView.setFloatingLabel(sdf.format(new Date()));
 
-        int colorFrom = ((ColorDrawable) this.binding.activitySun.getBackground()).getColor();
-        int colorTo = ContextCompat.getColor(this, color);
-
+        final int colorFrom = ((ColorDrawable) this.binding.activitySun.getBackground()).getColor();
+        final int colorTo = ContextCompat.getColor(this, color);
         animateBackground(colorFrom, colorTo);
 
         this.binding.titleWrapper.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showInfo(currentPhase.getName());
+                showInfoActivity(currentPhase.getName());
             }
         });
 
-        updateInfoViewIfAttached(currentPhase.getName());
+        final long span = sunsetEnd - sunriseStart;
+        final long current = Calendar.getInstance().getTimeInMillis() - sunriseStart;
+        final double progress = (double) current / (double) span;
 
         binding.sunView.setColor(ContextCompat.getColor(this, priColor))
                 .setStartLabel(sunriseTime)
                 .setEndLabel(sunsetTime)
-                .setFloatingLabel(DateUtil.dateFormat("HH:mm", new Date()))
-                .showStartAndEndTime(true, true)
-                .showFloatingLabel(true)
-                .setDateProgress(sunriseStart, sunsetEnd);
+                .setFloatingLabel(sdf.format(new Date()))
+                .setPercentProgress(progress);
 
         firstTime = false;
+    }
+
+    private void showInfoActivity(final String phaseName) {
+        final Intent intent = new Intent(this, InfoActivity.class);
+        intent.putExtra(InfoActivity.PHASE_NAME, phaseName);
+        startActivity(intent);
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
     }
 
     private void animateBackground(final int colorFrom, final int colorTo) {
@@ -233,7 +203,7 @@ public class SunActivity extends BaseActivity {
             return;
         }
 
-        ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
+        final ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
         colorAnimation.setDuration(400);
         colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -250,17 +220,6 @@ public class SunActivity extends BaseActivity {
     }
 
     @Override
-    public void onBackPressed(){
-        FragmentManager fm = getSupportFragmentManager();
-
-        if (fm.getBackStackEntryCount() >= 1) {
-            fm.popBackStackImmediate();
-        } else {
-            finish();
-        }
-    }
-
-    @Override
     protected void onDestroy() {
         super.onDestroy();
 
@@ -270,11 +229,6 @@ public class SunActivity extends BaseActivity {
 
         if (timeReceiver != null) {
             this.unregisterReceiver(timeReceiver);
-        }
-
-        if (binding != null) {
-            binding.unbind();
-            binding = null;
         }
     }
 }

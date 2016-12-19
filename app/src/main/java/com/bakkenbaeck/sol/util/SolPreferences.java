@@ -56,7 +56,7 @@ public class SolPreferences {
         return Double.longBitsToDouble(this.prefs.getLong(key, Double.doubleToLongBits(defaultValue)));
     }
 
-    public void cacheShowNotification(final boolean showNotification) {
+    public void setShowNotification(final boolean showNotification) {
         prefs.edit().putBoolean(SHOW_NOTIFICATIONS, showNotification).apply();
     }
 

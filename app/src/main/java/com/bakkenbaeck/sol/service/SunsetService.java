@@ -18,39 +18,28 @@ import android.text.Html;
 import com.bakkenbaeck.sol.R;
 import com.bakkenbaeck.sol.ui.SunActivity;
 import com.bakkenbaeck.sol.util.DailyMessage;
-import com.bakkenbaeck.sol.util.DateUtil;
 import com.bakkenbaeck.sol.util.SolPreferences;
-import com.bakkenbaeck.sol.util.SunPhaseUtil;
 import com.bakkenbaeck.sol.util.ThreeDayPhases;
-import com.florianmski.suncalc.models.SunPhase;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
-
-import java.util.Date;
 
 public class SunsetService extends Service implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
     public static final String ACTION_UPDATE = "com.example.androidintentservice.UPDATE";
     public static final String EXTRA_DAILY_MESSAGE = "daily_message";
-    public static final String EXTRA_TODAYS_DATE = "todays_date";
-    public static final String EXTRA_SHOW_NOTIFICATION = "show_notification";
     public static final String EXTRA_SUNRISE_TIME = "sunrise_time";
     public static final String EXTRA_SUNSET_TIME = "sunset_time";
     public static final String EXTRA_LOCATION_MESSAGE = "location_message";
     public static final String EXTRA_CURRENT_PHASE = "current_phase";
-
-    public static final String EXTRA_LAT = "extra_lat";
-    public static final String EXTRA_LON = "extra_lon";
-
-    public static final String SUNRISE_START = "sunrise_start";
-    public static final String SUNSET_END = "sunset_end";
+    public static final String EXTRA_SHOW_NOTIFICATION = "show_notification";
 
     private GoogleApiClient googleApiClient;
     private DailyMessage dailyMessage;
-    private boolean showNotification;
     private SolPreferences prefs;
+
+    private boolean showNotification;
 
     @Override
     public void onCreate() {
@@ -100,42 +89,33 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
     private void updateLocation(final Location location) {
         final Location safeLocation = storeLocation(location);
         final ThreeDayPhases threeDayPhases = new ThreeDayPhases().init(safeLocation);
-
-        final String todaysDate = DateUtil.dateFormat("dd. MM. yyyy", new Date());
-        final String currentPhaseName = threeDayPhases.getCurrentPhase().getName();
         final long tomorrowsSunrise = threeDayPhases.getTomorrowsSunrise();
 
+        final String currentPhaseName = threeDayPhases.getCurrentPhase().getName();
         final String todaysMessage = this.dailyMessage.generate(threeDayPhases);
         final String locationMessage = this.dailyMessage.getLocation(safeLocation.getLatitude(), safeLocation.getLongitude());
-
-        final SunPhase sunrise = SunPhaseUtil.getSunPhase(safeLocation.getLatitude(), safeLocation.getLongitude(), "Sunrise");
-        final SunPhase sunset = SunPhaseUtil.getSunPhase(safeLocation.getLatitude(), safeLocation.getLongitude(), "Sunset");
 
         final Intent intentUpdate = new Intent();
         intentUpdate.setAction(ACTION_UPDATE);
         intentUpdate.addCategory(Intent.CATEGORY_DEFAULT);
         intentUpdate.putExtra(EXTRA_DAILY_MESSAGE, todaysMessage);
-        intentUpdate.putExtra(EXTRA_TODAYS_DATE, todaysDate);
-        intentUpdate.putExtra(EXTRA_SUNRISE_TIME, threeDayPhases.getTodaysSunriseAsString());
-        intentUpdate.putExtra(EXTRA_SUNSET_TIME, threeDayPhases.getTodaysSunsetAsString());
+        intentUpdate.putExtra(EXTRA_SUNRISE_TIME, threeDayPhases.getTodaysSunriseAsLong());
+        intentUpdate.putExtra(EXTRA_SUNSET_TIME, threeDayPhases.getTodaysSunsetAsLong());
         intentUpdate.putExtra(EXTRA_LOCATION_MESSAGE, locationMessage);
         intentUpdate.putExtra(EXTRA_CURRENT_PHASE, currentPhaseName);
 
-        intentUpdate.putExtra(EXTRA_LAT, safeLocation.getLatitude());
-        intentUpdate.putExtra(EXTRA_LON, safeLocation.getLongitude());
-
-        Bundle b = new Bundle();
-        b.putSerializable(SUNRISE_START, sunrise.getStartDate().getTime());
-        b.putSerializable(SUNSET_END, sunset.getEndDate().getTime());
-        intentUpdate.putExtras(b);
-
         sendBroadcast(intentUpdate);
 
-        if (this.showNotification) {
+        final SolPreferences solPreferences = new SolPreferences(this);
+        final boolean notificationEnabled = solPreferences.getShowNotification();
+
+        if (notificationEnabled && showNotification) {
             showNotification(todaysMessage);
         }
 
-        enableTomorrowsAlarm(tomorrowsSunrise);
+        if (notificationEnabled) {
+            enableTomorrowsAlarm(tomorrowsSunrise);
+        }
 
         stopSelf();
     }
@@ -164,8 +144,8 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
                         .setSmallIcon(R.mipmap.ic_launcher)
                         .setContentText(stripHtml(todaysMessage))
                         .setContentIntent(resultPendingIntent);
-        final NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        mNotifyMgr.notify(1, mBuilder.build());
+        final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        notificationManager.notify(1, mBuilder.build());
     }
 
     public String stripHtml(final String html) {
@@ -179,6 +159,4 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         updateLocation(null);
     }
-
-
 }

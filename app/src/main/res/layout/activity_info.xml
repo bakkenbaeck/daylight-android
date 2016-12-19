@@ -8,6 +8,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         tools:context="com.bakkenbaeck.sol.ui.SunActivity"
+        android:paddingTop="24dp"
         android:background="@color/daylight">
 
         <LinearLayout
@@ -17,8 +18,7 @@
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
-            android:background="?android:selectableItemBackground">
+            android:paddingRight="@dimen/activity_horizontal_margin">
 
             <ImageView
                 android:id="@+id/sun_circle"

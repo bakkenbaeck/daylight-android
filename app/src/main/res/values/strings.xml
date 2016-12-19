@@ -13,4 +13,8 @@
     <string name="close">Close</string>
     <string name="minutes">minutes</string>
     <string name="minute">minute</string>
+    <string name="on">on</string>
+    <string name="off">off</string>
+    <string name="hh_mm">HH:mm</string>
+    <string name="dd_mm_yy">dd. MM. yyyy</string>
 </resources>
