@@ -17,4 +17,6 @@
     <string name="off">off</string>
     <string name="hh_mm">HH:mm</string>
     <string name="dd_mm_yy">dd. MM. yyyy</string>
+    <string name="enable_location_message"><![CDATA[Hei! Please <font color={color}>enable location access</font> so we can give you your exact sun data.]]></string>
+    <string name="looking_for_you_location">Looking for you location...</string>
 </resources>
