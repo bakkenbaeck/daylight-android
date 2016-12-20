@@ -7,7 +7,7 @@
     <string name="presentTense">has</string>
     <string name="pastTense">had</string>
     <string name="share">Share</string>
-    <string name="info_message"><![CDATA[Daylight is an app inspired by the long and dark winters of the north. Made by <font color={color}>Bakken & Bæck</font>]]></string>
+    <string name="info_message"><![CDATA[Daylight is an app inspired by the long and dark winters of the north. Made by <font color={color}><a href=\"https://bakkenbaeck.com\">Bakken & Bæck</a></font>]]></string>
     <string name="turn_notifications">Turn notifications</string>
     <string name="close">Close</string>
     <string name="minutes">minutes</string>

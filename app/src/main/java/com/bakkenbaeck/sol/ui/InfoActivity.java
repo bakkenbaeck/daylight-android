@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.text.Html;
 import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
 import android.view.View;
 
 import com.bakkenbaeck.sol.R;
@@ -50,6 +51,7 @@ public class InfoActivity extends BaseActivity {
         final String formattedInfo = infoMessage.replace("{color}", String.valueOf(ContextCompat
                 .getColor(this, currentPhase.getPrimaryColor())));
         final Spanned s = convertToHtml(formattedInfo);
+        this.binding.infoMessage.setMovementMethod(LinkMovementMethod.getInstance());
         this.binding.infoMessage.setText(s);
 
         final int color = currentPhase.getBackgroundColor();
