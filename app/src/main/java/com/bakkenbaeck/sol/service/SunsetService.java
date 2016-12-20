@@ -39,7 +39,7 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
     private DailyMessage dailyMessage;
     private SolPreferences prefs;
 
-    private boolean showNotification;
+    private boolean shouldTryAndShowNotification;
 
     @Override
     public void onCreate() {
@@ -55,7 +55,7 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
 
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
-        this.showNotification = intent.getBooleanExtra(EXTRA_SHOW_NOTIFICATION, false);
+        this.shouldTryAndShowNotification = intent.getBooleanExtra(EXTRA_SHOW_NOTIFICATION, false);
         this.googleApiClient.connect();
         return super.onStartCommand(intent, flags, startId);
     }
@@ -106,25 +106,13 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
 
         sendBroadcast(intentUpdate);
 
-        final SolPreferences solPreferences = new SolPreferences(this);
-        final boolean notificationEnabled = solPreferences.getShowNotification();
-
-        if (notificationEnabled && showNotification) {
-            showNotification(todaysMessage);
+        if (this.shouldTryAndShowNotification) {
+            tryAndShowNotification(todaysMessage);
         }
 
-        if (notificationEnabled) {
-            enableTomorrowsAlarm(tomorrowsSunrise);
-        }
+        tryAndEnableTomorrowsAlarm(tomorrowsSunrise);
 
         stopSelf();
-    }
-
-    private void enableTomorrowsAlarm(final long alarmTime) {
-        final Intent alarmIntent = new Intent(SunsetService.this, AlarmReceiver.class);
-        final PendingIntent pendingIntent = PendingIntent.getBroadcast(SunsetService.this, 0, alarmIntent, 0);
-        final AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        manager.set(AlarmManager.RTC_WAKEUP, alarmTime, pendingIntent);
     }
 
     private Location storeLocation(final Location location) {
@@ -134,6 +122,16 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
         }
 
         return this.prefs.getCachedLocation();
+    }
+
+    private void tryAndShowNotification(final String todaysMessage) {
+        final SolPreferences solPreferences = new SolPreferences(this);
+        final boolean notificationEnabled = solPreferences.getShowNotification();
+        if (!notificationEnabled) {
+            return;
+        }
+
+        showNotification(todaysMessage);
     }
 
     private void showNotification(final String todaysMessage) {
@@ -146,6 +144,23 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
                         .setContentIntent(resultPendingIntent);
         final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         notificationManager.notify(1, mBuilder.build());
+    }
+
+    private void tryAndEnableTomorrowsAlarm(final long alarmTime) {
+        final SolPreferences solPreferences = new SolPreferences(this);
+        final boolean notificationEnabled = solPreferences.getShowNotification();
+        if (!notificationEnabled) {
+            return;
+        }
+
+        enableTomorrowsAlarm(alarmTime);
+    }
+
+    private void enableTomorrowsAlarm(final long alarmTime) {
+        final Intent alarmIntent = new Intent(SunsetService.this, AlarmReceiver.class);
+        final PendingIntent pendingIntent = PendingIntent.getBroadcast(SunsetService.this, 0, alarmIntent, 0);
+        final AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        manager.set(AlarmManager.RTC_WAKEUP, alarmTime, pendingIntent);
     }
 
     public String stripHtml(final String html) {

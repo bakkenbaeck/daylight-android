@@ -12,6 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:name=".BaseApplication">
+
         <activity android:name=".ui.SunActivity"
             android:screenOrientation="portrait"
             android:launchMode="singleTask">

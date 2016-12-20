@@ -35,24 +35,48 @@ public class InfoActivity extends BaseActivity {
 
     private void init() {
         this.binding = DataBindingUtil.setContentView(this, R.layout.activity_info);
+
+        setColorsFromPhaseName();
+        initNotificationsToggle();
+        assignClickListeners();
+        registerForSunPhaseChanges();
+    }
+
+    private void setColorsFromPhaseName() {
         final String phaseName = getIntent().getStringExtra(PHASE_NAME);
 
-        setColors(phaseName);
+        final CurrentPhase currentPhase = new CurrentPhase(phaseName);
+        final String infoMessage = getResources().getString(R.string.info_message);
+        final String formatedInfo = infoMessage.replace("{color}", String.valueOf(ContextCompat
+                .getColor(this, currentPhase.getPrimaryColor())));
+        final Spanned s = convertToHtml(formatedInfo);
+        this.binding.infoMessage.setText(s);
 
-        this.binding.titleWrapper.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-            }
-        });
+        final int color = currentPhase.getBackgroundColor();
+        final int priColor = currentPhase.getPrimaryColor();
+        final int secColor = currentPhase.getSecondaryColor();
 
+        this.binding.title.setTextColor(ContextCompat.getColor(this, secColor));
+        this.binding.infoMessage.setTextColor(ContextCompat.getColor(this, secColor));
+        this.binding.notificationText.setTextColor(ContextCompat.getColor(this, secColor));
+        this.binding.notificationValue.setTextColor(ContextCompat.getColor(this, priColor));
+
+        final int colorFrom = ((ColorDrawable) this.binding.root.getBackground()).getColor();
+        final int colorTo = ContextCompat.getColor(this, color);
+        animateBackground(colorFrom, colorTo);
+
+        setSunDrawable(currentPhase);
+    }
+
+    private void initNotificationsToggle() {
         final SolPreferences solPrefs = new SolPreferences(this);
         this.notificationEnabled = solPrefs.getShowNotification();
 
         final String s = notificationEnabled ? getString(R.string.off) : getString(R.string.on);
-
         this.binding.notificationValue.setText(s);
+    }
+
+    private void assignClickListeners() {
         this.binding.notificationWrapper.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -65,10 +89,16 @@ public class InfoActivity extends BaseActivity {
             }
         });
 
-        register();
+        this.binding.titleWrapper.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+            }
+        });
     }
 
-    private void register() {
+    private void registerForSunPhaseChanges() {
         final IntentFilter intentFilter = new IntentFilter(SunsetService.ACTION_UPDATE);
         intentFilter.addCategory(Intent.CATEGORY_DEFAULT);
         this.sunsetBroadcastReceiver = new SunsetBroadcastReceiver();
@@ -78,36 +108,13 @@ public class InfoActivity extends BaseActivity {
     private class SunsetBroadcastReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(final Context context, final Intent intent) {
-            final CurrentPhase currentPhase = new CurrentPhase(intent.getStringExtra(SunsetService.EXTRA_CURRENT_PHASE));
-            setColors(currentPhase.getName());
+            setColorsFromPhaseName();
         }
     }
 
-    private void setColors(final String phaseName) {
-        final CurrentPhase phase = new CurrentPhase(phaseName);
-        final String infoMessage = getResources().getString(R.string.info_message);
-        final String formatedInfo = infoMessage.replace("{color}", String.valueOf(ContextCompat
-                .getColor(this, phase.getPrimaryColor())));
-        final Spanned s = convertToHtml(formatedInfo);
-        this.binding.infoMessage.setText(s);
+    public void setSunDrawable(final CurrentPhase currentPhase) {
+        final int color = currentPhase.getSecondaryColor();
 
-        final int color = phase.getBackgroundColor();
-        final int priColor = phase.getPrimaryColor();
-        final int secColor = phase.getSecondaryColor();
-
-        this.binding.title.setTextColor(ContextCompat.getColor(this, secColor));
-        this.binding.infoMessage.setTextColor(ContextCompat.getColor(this, secColor));
-        this.binding.notificationText.setTextColor(ContextCompat.getColor(this, secColor));
-        this.binding.notificationValue.setTextColor(ContextCompat.getColor(this, priColor));
-
-        final int colorFrom = ((ColorDrawable) this.binding.root.getBackground()).getColor();
-        final int colorTo = ContextCompat.getColor(this, color);
-        animateBackground(colorFrom, colorTo);
-
-        setSunDrawable(secColor);
-    }
-
-    public void setSunDrawable(final int color) {
         switch (color) {
             case R.color.sunrise_text: {
                 this.binding.sunCircle.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.half_circle_sunrise));
