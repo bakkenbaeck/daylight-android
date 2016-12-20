@@ -139,7 +139,7 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
         final PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         final NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setSmallIcon(R.mipmap.daylight_icon)
                         .setContentText(stripHtml(todaysMessage))
                         .setContentIntent(resultPendingIntent);
         final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
