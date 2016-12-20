@@ -47,9 +47,9 @@ public class InfoActivity extends BaseActivity {
 
         final CurrentPhase currentPhase = new CurrentPhase(phaseName);
         final String infoMessage = getResources().getString(R.string.info_message);
-        final String formatedInfo = infoMessage.replace("{color}", String.valueOf(ContextCompat
+        final String formattedInfo = infoMessage.replace("{color}", String.valueOf(ContextCompat
                 .getColor(this, currentPhase.getPrimaryColor())));
-        final Spanned s = convertToHtml(formatedInfo);
+        final Spanned s = convertToHtml(formattedInfo);
         this.binding.infoMessage.setText(s);
 
         final int color = currentPhase.getBackgroundColor();
