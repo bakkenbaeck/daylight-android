@@ -19,7 +19,13 @@
         <item><![CDATA[Sadly, the day will be <font color={color}>{numMinutes} {minutes} shorter</font>. Make the most out of it!]]></item>
     </string-array>
 
-    <string-array name="daily_messages_no_change">
+    <string-array name="daily_messages_negative_less_than_one_minute">
+        <item><![CDATA[Unfortunately, the day is a little bit shorter today. Make the most out of it!]]></item>
+        <item><![CDATA[Sadly, today is a tiny bit shorter than yesterday. Enjoy it while it lasts!]]></item>
+        <item><![CDATA[Today is shorter than yesterday. But fear not, brighter times ahead!]]></item>
+    </string-array>
+
+    <string-array name="daily_messages_positive_less_than_one_minute">
         <item><![CDATA[Little less than <font color={color}>a minute</font> of extra sunlight today. It\'s getting better!]]></item>
         <item><![CDATA[We\'ve reached the tipping point: we\'ll have more sunlight every day now!]]></item>
         <item><![CDATA[<font color={color}>About a minute</font> of extra light. You\'ll start noticing the difference soon!]]></item>
@@ -36,10 +42,20 @@
     </string-array>
 
     <string-array name="night_messages_negative">
-        <item><![CDATA[Get a good night\'s sleep: tomorrow there\'ll be <font color={color}>{numMinutes} more {minutes}</font> of sunlight.]]></item>
-        <item><![CDATA[Lights out. Enjoy <font color={color}>{numMinutes} more {minutes}</font> of sunlight tomorrow!]]></item>
-        <item><![CDATA[Bring out those pyjamas. <font color={color}>{numMinutes} more {minutes}</font> of light await tomorrow.]]></item>
-        <item><![CDATA[The sun has set for today. Embrace those <font color={color}>{numMinutes} {minutes}</font> of extra daylight tomorrow.]]></item>
+        <item><![CDATA[Unfortunately, tomorrow will be <font color={color}>{numMinutes} minutes</font> shorter than today. Make the most out of it!]]></item>
+        <item><![CDATA[Sadly, tomorrow will be <font color={color}>{numMinutes} minutes</font> shorter than today. Enjoy it while it lasts!]]></item>
+        <item><![CDATA[Tomorrow will be <font color={color}>{numMinutes} minutes</font> shorter than today. But fear not, brighter times ahead!]]></item>
+    </string-array>
+
+    <string-array name="night_messages_negative_less_than_one_minute">
+        <item><![CDATA[Unfortunately, the day is a little bit shorter today. Make the most out of it!]]></item>
+        <item><![CDATA[Sadly, today is a tiny bit shorter than yesterday. Enjoy it while it lasts!]]></item>
+        <item><![CDATA[Tomorrow will be shorter than today. But fear not, brighter times ahead!]]></item>
+    </string-array>
+
+    <string-array name="night_messages_positive_less_than_one_minute">
+        <item><![CDATA[Get a good night’s sleep: tomorrow there’ll be more sunlight for you.]]></item>
+        <item><![CDATA[Bring out those pyjamas. More daylight awaits tomorrow!]]></item>
         <item><![CDATA[The sun has set. Soak up the extra vitamin D tomorrow!]]></item>
     </string-array>
 

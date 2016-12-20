@@ -39,26 +39,8 @@ public class DailyMessage {
                                    final int minutes,
                                    final boolean isDayGettingLonger,
                                    final int primaryColor) {
-        final String nightPhaseName = SunPhase.all().get(ThreeDayPhases.NIGHT).getName().toString();
 
-        final boolean isLessThanAMinute = minutes == 0;
-        final boolean isNightAndLongerDays = phaseName.equals(nightPhaseName) && isDayGettingLonger;
-        final boolean isNightAndShorterDays = phaseName.equals(nightPhaseName) && !isDayGettingLonger;
-        final boolean isDayAndShorterDays = !phaseName.equals(nightPhaseName) && !isDayGettingLonger;
-
-        String[] messageArray;
-
-        if (isLessThanAMinute) {
-            messageArray = context.getResources().getStringArray(R.array.daily_messages_no_change);
-        } else if (isNightAndLongerDays) {
-            messageArray = context.getResources().getStringArray(R.array.night_messages_positive);
-        } else if(isNightAndShorterDays) {
-            messageArray = context.getResources().getStringArray(R.array.night_messages_negative);
-        } else if(isDayAndShorterDays) {
-            messageArray = context.getResources().getStringArray(R.array.daily_messages_negative);
-        } else {
-            messageArray = context.getResources().getStringArray(R.array.daily_messages_positive);
-        }
+        String[] messageArray = getMessageArray(minutes, isDayGettingLonger, phaseName);
 
         final int dayOfYear = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
         final int messagePosition = dayOfYear % messageArray.length;
@@ -67,6 +49,38 @@ public class DailyMessage {
                 .replace("{color}", String.valueOf(ContextCompat.getColor(context, primaryColor)))
                 .replace("{numMinutes}", String.valueOf(minutes))
                 .replace("{minutes}", plural(minutes));
+    }
+
+    private String[] getMessageArray(final int minutes, final boolean isDayGettingLonger, final String phaseName) {
+        final String nightPhaseName = SunPhase.all().get(ThreeDayPhases.NIGHT).getName().toString();
+        final boolean isLessThanAMinute = minutes == 0;
+        final boolean isNight = phaseName.equals(nightPhaseName);
+
+        int messageArrayRef;
+
+        if (isLessThanAMinute) {
+            if (isNight && isDayGettingLonger) {
+                messageArrayRef = R.array.night_messages_positive_less_than_one_minute;
+            } else if (isNight && !isDayGettingLonger) {
+                messageArrayRef = R.array.night_messages_negative_less_than_one_minute;
+            } else if (!isNight && isDayGettingLonger) {
+                messageArrayRef = R.array.daily_messages_positive_less_than_one_minute;
+            } else {
+                messageArrayRef = R.array.daily_messages_negative_less_than_one_minute;
+            }
+        } else {
+            if (isNight && isDayGettingLonger) {
+                messageArrayRef = R.array.night_messages_positive;
+            } else if (isNight && !isDayGettingLonger) {
+                messageArrayRef = R.array.night_messages_negative;
+            } else if (!isNight && isDayGettingLonger) {
+                messageArrayRef = R.array.daily_messages_positive;
+            } else {
+                messageArrayRef = R.array.daily_messages_negative;
+            }
+        }
+
+        return context.getResources().getStringArray(messageArrayRef);
     }
 
     private String plural(final int minutes) {
