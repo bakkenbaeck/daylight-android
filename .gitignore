@@ -45,5 +45,8 @@ AndroidManifest.xml-e
 screenshots/*/
 screenshots/*.html
 
+#Fonts
+/app/src/main/assets/fonts/gtamericalight.ttf
+
 # Secret stuff
 *secrets.xml
