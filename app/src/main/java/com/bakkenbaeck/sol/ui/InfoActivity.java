@@ -37,13 +37,13 @@ public class InfoActivity extends BaseActivity {
     private void init() {
         this.binding = DataBindingUtil.setContentView(this, R.layout.activity_info);
 
-        setColorsFromPhaseName();
+        setColorsFromPhaseName(false);
         initNotificationsToggle();
         assignClickListeners();
         registerForSunPhaseChanges();
     }
 
-    private void setColorsFromPhaseName() {
+    private void setColorsFromPhaseName(final boolean animateBackground) {
         final String phaseName = getIntent().getStringExtra(PHASE_NAME);
 
         final CurrentPhase currentPhase = new CurrentPhase(phaseName);
@@ -65,7 +65,12 @@ public class InfoActivity extends BaseActivity {
 
         final int colorFrom = ((ColorDrawable) this.binding.root.getBackground()).getColor();
         final int colorTo = ContextCompat.getColor(this, color);
-        animateBackground(colorFrom, colorTo);
+
+        if (animateBackground) {
+            animateBackground(colorFrom, colorTo);
+        } else {
+            this.binding.root.setBackgroundColor(colorTo);
+        }
 
         setSunDrawable(currentPhase);
     }
@@ -110,7 +115,7 @@ public class InfoActivity extends BaseActivity {
     private class SunsetBroadcastReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(final Context context, final Intent intent) {
-            setColorsFromPhaseName();
+            setColorsFromPhaseName(true);
         }
     }
 
