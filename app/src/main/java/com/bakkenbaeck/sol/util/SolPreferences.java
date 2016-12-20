@@ -61,6 +61,8 @@ public class SolPreferences {
     }
 
     public boolean getShowNotification() {
-        return prefs.getBoolean(SHOW_NOTIFICATIONS, false);
+        return prefs.getBoolean(SHOW_NOTIFICATIONS, true);
     }
+
+
 }
