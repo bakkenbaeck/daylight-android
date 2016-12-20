@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">sol</string>
+    <string name="app_name">Daylight</string>
     <string name="notifications">NOTIFICATIONS</string>
     <string name="default_city">your location</string>
     <string name="more">more</string>
@@ -7,8 +7,7 @@
     <string name="presentTense">has</string>
     <string name="pastTense">had</string>
     <string name="share">Share</string>
-    <string name="sol">Sol</string>
-    <string name="info_message"><![CDATA[Sol is an experiment by <font color={color}>Bakken & Bæck</font>, inspired by the dark and long winters of the north.]]></string>
+    <string name="info_message"><![CDATA[Daylight is an app inspired by the long and dark winters of the north. Made by <font color={color}>Bakken & Bæck</font>]]></string>
     <string name="turn_notifications">Turn notifications</string>
     <string name="close">Close</string>
     <string name="minutes">minutes</string>
@@ -17,6 +16,6 @@
     <string name="off">off</string>
     <string name="hh_mm">HH:mm</string>
     <string name="dd_mm_yy">dd. MM. yyyy</string>
-    <string name="enable_location_message"><![CDATA[Hei! Please <font color={color}>enable location access</font> so we can give you your exact sun data.]]></string>
-    <string name="looking_for_you_location">Looking for you location...</string>
+    <string name="start__permission_description"><![CDATA[Hi! Daylight uses your <font color={color}>location</font> to give you accurate daylight information.]]></string>
+    <string name="start__call_to_action">Tap to continue</string>
 </resources>

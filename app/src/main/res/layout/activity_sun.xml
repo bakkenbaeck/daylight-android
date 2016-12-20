@@ -33,7 +33,7 @@
                 android:layout_marginLeft="8dp"
                 android:textSize="16sp"
                 android:textColor="@color/daylight_text"
-                android:text="@string/sol"/>
+                android:text="@string/app_name"/>
 
         </LinearLayout>
 

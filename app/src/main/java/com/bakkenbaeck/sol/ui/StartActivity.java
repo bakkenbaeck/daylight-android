@@ -45,7 +45,7 @@ public class StartActivity extends BaseActivity {
     private void assignClickListeners() {
         ActivityStartBinding binding  = DataBindingUtil.setContentView(this, R.layout.activity_start);
         binding.infoMessage.setText(convertToHtml(getRequestLocationMessage()));
-        binding.infoMessage.setOnClickListener(new View.OnClickListener() {
+        binding.getRoot().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 ActivityCompat.requestPermissions(StartActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
@@ -67,7 +67,7 @@ public class StartActivity extends BaseActivity {
     }
 
     private String getRequestLocationMessage() {
-        final String message = getString(R.string.enable_location_message);
+        final String message = getString(R.string.start__permission_description);
         final int color = ContextCompat.getColor(this, R.color.daylight_text2);
         return message.replace("{color}", String.valueOf(color));
     }

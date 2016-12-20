@@ -38,7 +38,7 @@
             android:layout_marginTop="32dp"
             android:textSize="@dimen/text_size_sec"
             android:textColor="@color/daylight_text"
-            android:text="@string/looking_for_you_location"/>
+            android:text="@string/start__call_to_action"/>
 
     </LinearLayout>
 
