@@ -1,19 +1,15 @@
 package com.bakkenbaeck.sol.util;
 
 import android.content.Context;
-import android.location.Location;
-import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 
 import com.bakkenbaeck.sol.R;
 import com.bakkenbaeck.sol.location.CurrentCity;
+import com.florianmski.suncalc.models.SunPhase;
 
-import org.joda.time.DateTime;
-import org.joda.time.Period;
-import org.joda.time.Seconds;
+import java.util.Calendar;
 
 public class DailyMessage {
-
 
     private final CurrentCity currentCity;
     private final Context context;
@@ -23,52 +19,73 @@ public class DailyMessage {
         this.currentCity = new CurrentCity(context);
     }
 
-    public String generate(final ThreeDayPhases threeDayPhases, final Location location) {
-        final Period dayLengthChange = threeDayPhases.getDayLengthChangeBetweenTodayAndYesterday();
-        final String city = getNearestCity(location);
-        final String diffText = getDiffText(dayLengthChange);
-        final String numMinutesText = getNumberMinutesText(dayLengthChange);
-
+    public String generate(final ThreeDayPhases threeDayPhases) {
         final CurrentPhase phase = threeDayPhases.getCurrentPhase();
-        final int primaryColor = phase.getPrimaryColor();
+        final String phaseName = phase.getName();
 
-        return getRawMessage()
-                .replace("{color}", String.valueOf(ContextCompat.getColor(context, primaryColor)))
-                .replace("{city}", city)
-                .replace("{numMinutes}", numMinutesText)
-                .replace("{moreOrLess}", diffText);
+        final String nightPhaseName = SunPhase.all().get(ThreeDayPhases.NIGHT).getName().toString();
+        final Calendar dayLengthChange = phaseName.equals(nightPhaseName)
+                ? threeDayPhases.getDayLengthChangeBetweenTodayAndTomorrow()
+                : threeDayPhases.getDayLengthChangeBetweenTodayAndYesterday();
+
+        final boolean isDayGettingLonger = isDayGettingLonger(dayLengthChange);
+        final int primaryColor = phase.getPrimaryColor();
+        final int minutes = getRoundedMinutesForCalendar(dayLengthChange);
+
+        return generateMessage(phaseName, minutes, isDayGettingLonger, primaryColor);
     }
 
-    private String getNearestCity(final Location location) {
-        return this.currentCity.get(location.getLatitude(), location.getLongitude());
+    private String generateMessage(final String phaseName,
+                                   final int minutes,
+                                   final boolean isDayGettingLonger,
+                                   final int primaryColor) {
+        final String nightPhaseName = SunPhase.all().get(ThreeDayPhases.NIGHT).getName().toString();
+
+        final boolean isLessThanAMinute = minutes == 0;
+        final boolean isNightAndLongerDays = phaseName.equals(nightPhaseName) && isDayGettingLonger;
+        final boolean isNightAndShorterDays = phaseName.equals(nightPhaseName) && !isDayGettingLonger;
+        final boolean isDayAndShorterDays = !phaseName.equals(nightPhaseName) && !isDayGettingLonger;
+
+        String[] messageArray;
+
+        if (isLessThanAMinute) {
+            messageArray = context.getResources().getStringArray(R.array.daily_messages_no_change);
+        } else if (isNightAndLongerDays) {
+            messageArray = context.getResources().getStringArray(R.array.night_messages_positive);
+        } else if(isNightAndShorterDays) {
+            messageArray = context.getResources().getStringArray(R.array.night_messages_negative);
+        } else if(isDayAndShorterDays) {
+            messageArray = context.getResources().getStringArray(R.array.daily_messages_negative);
+        } else {
+            messageArray = context.getResources().getStringArray(R.array.daily_messages_positive);
+        }
+
+        final int dayOfYear = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
+        final int messagePosition = dayOfYear % messageArray.length;
+
+        return messageArray[messagePosition]
+                .replace("{color}", String.valueOf(ContextCompat.getColor(context, primaryColor)))
+                .replace("{numMinutes}", String.valueOf(minutes))
+                .replace("{minutes}", plural(minutes));
+    }
+
+    private String plural(final int minutes) {
+        return minutes > 1
+                ? context.getResources().getString(R.string.minutes)
+                : context.getResources().getString(R.string.minute);
     }
 
     public String getLocation(final double latitude, final double longitude) {
         return currentCity.getCityAndCountry(latitude, longitude);
     }
 
-    @NonNull
-    private String getDiffText(final Period dayLengthChange) {
-        final Seconds dayLengthChangeInSeconds = dayLengthChange.toStandardSeconds();
-
-        return
-                dayLengthChangeInSeconds.isGreaterThan(Seconds.ZERO)
-                        ? context.getResources().getString(R.string.more)
-                        : context.getResources().getString(R.string.less);
+    private boolean isDayGettingLonger(final Calendar dayLengthChange) {
+        final long dayLengthChangeInSeconds = dayLengthChange.getTimeInMillis() / 1000;
+        return dayLengthChangeInSeconds > 0;
     }
 
-    @NonNull
-    private String getNumberMinutesText(final Period dayLengthChange) {
-        final int numMinutes =
-                Math.abs(dayLengthChange.getMinutes())
-                        + Math.abs(dayLengthChange.getSeconds()) / 30;
-        return this.context.getResources().getQuantityString(R.plurals.minutes, numMinutes, numMinutes);
-    }
-
-    private String getRawMessage() {
-        final int dayOfYear = DateTime.now().dayOfYear().get();
-        final String[] allMessages = this.context.getResources().getStringArray(R.array.daily_message);
-        final int messagePosition = dayOfYear % allMessages.length;
-        return allMessages[messagePosition];
+    private int getRoundedMinutesForCalendar(final Calendar dayLengthChange) {
+        final double numMinutes = Math.abs((double)dayLengthChange.getTimeInMillis() / (double)(1000 * 60));
+        return (int) Math.round(numMinutes);
     }
 }

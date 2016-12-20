@@ -3,13 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <LinearLayout
-        android:id="@+id/activity_sun"
+        android:id="@+id/root"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
+        tools:context="com.bakkenbaeck.sol.ui.SunActivity"
         android:paddingTop="24dp"
-        android:background="@color/daylight"
-        tools:context="com.bakkenbaeck.sol.ui.SunActivity">
+        android:background="@color/daylight">
 
         <LinearLayout
             android:id="@+id/title_wrapper"
@@ -22,9 +22,9 @@
 
             <ImageView
                 android:id="@+id/sun_circle"
-                android:layout_width="@dimen/sun_size"
-                android:layout_height="@dimen/sun_size"
-                android:src="@drawable/circle"/>
+                android:layout_width="16dp"
+                android:scaleType="fitStart"
+                android:layout_height="@dimen/sun_size" />
 
             <TextView
                 android:id="@+id/title"
@@ -33,7 +33,7 @@
                 android:layout_marginLeft="8dp"
                 android:textSize="16sp"
                 android:textColor="@color/daylight_text"
-                android:text="@string/sol"/>
+                android:text="@string/close"/>
 
         </LinearLayout>
 
@@ -42,16 +42,8 @@
             android:layout_height="0dp"
             android:layout_weight="5"/>
 
-        <com.bakkenbaeck.sunviewlib.SunView
-            android:id="@+id/sun_view"
-            android:layout_width="match_parent"
-            android:layout_marginRight="@dimen/activity_horizontal_margin"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_height="wrap_content"
-            android:alpha="0"/>
-
         <TextView
-            android:id="@+id/todays_message"
+            android:id="@+id/info_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textStyle="bold"
@@ -61,40 +53,35 @@
             android:layout_marginBottom="16dp"
             android:letterSpacing="-.04"
             android:layout_marginLeft="@dimen/activity_vertical_margin"
-            android:layout_marginRight="@dimen/activity_vertical_margin"
-            android:alpha="0"/>
+            android:layout_marginRight="@dimen/activity_vertical_margin" />
 
-        <FrameLayout
-            android:layout_width="match_parent"
+        <LinearLayout
+            android:id="@+id/notification_wrapper"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:layout_marginBottom="@dimen/activity_vertical_margin">
+            android:orientation="horizontal"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_marginLeft="@dimen/activity_vertical_margin"
+            android:layout_marginRight="@dimen/activity_vertical_margin"
+            android:layout_marginTop="32dp">
 
             <TextView
-                android:id="@+id/location"
+                android:id="@+id/notification_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="left"
                 android:textSize="@dimen/text_size_sec"
                 android:textColor="@color/daylight_text"
-                android:layout_marginLeft="@dimen/activity_vertical_margin"
-                android:layout_marginRight="@dimen/activity_vertical_margin"
-                android:alpha="0"/>
+                android:text="@string/turn_notifications"/>
 
             <TextView
-                android:id="@+id/share"
+                android:id="@+id/notification_value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="right"
+                android:layout_marginLeft="5dp"
                 android:textSize="@dimen/text_size_sec"
-                android:textColor="@color/daylight_text"
-                android:layout_marginLeft="@dimen/activity_vertical_margin"
-                android:layout_marginRight="@dimen/activity_vertical_margin"
-                android:text="@string/share"
-                android:alpha="0"
-                android:visibility="gone"/>
+                android:textColor="@color/daylight_text"/>
 
-        </FrameLayout>
+        </LinearLayout>
     </LinearLayout>
 
 </layout>

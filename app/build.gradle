@@ -3,9 +3,10 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 25
     buildToolsVersion "24.0.3"
+
     defaultConfig {
         applicationId "com.bakkenbaeck.sol"
-        minSdkVersion 9
+        minSdkVersion 14
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
@@ -29,9 +30,8 @@ dependencies {
             'com.android.support:appcompat-v7:25.0.1',
             // Google Play -- Location
             'com.google.android.gms:play-services-location:10.0.0',
-            'net.danlew:android.joda:2.9.5',
             // Prettyness
-            'net.colindodd:gradientlayout:1.1',
-            'uk.co.chrisjenx:calligraphy:2.2.0'
+            'uk.co.chrisjenx:calligraphy:2.2.0',
+            'com.github.bakkenbaeck.sunviewlib:sunviewlib:v1.0.1'
     )
 }

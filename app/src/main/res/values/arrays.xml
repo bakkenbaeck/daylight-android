@@ -1,6 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="daily_message">
-        <item><![CDATA[Today, <font color={color}>{city}</font> has <font color={color}>{numMinutes}</font> {moreOrLess} sunlight than yesterday.]]></item>
+    <string-array name="daily_messages_positive">
+        <item><![CDATA[Today is <font color={color}>{numMinutes} {minutes}</font> longer than yesterday. Happy days!]]></item>
+        <item><![CDATA[The sun is out for <font color={color}>{numMinutes} more {minutes}</font> today. Enjoy!]]></item>
+        <item><![CDATA[<font color={color}>{numMinutes} extra {minutes}</font> of sunshine today. Make them count!]]></item>
+        <item><![CDATA[Make sure to soak up that vitamin D. <font color={color}>{numMinutes} more {minutes}</font> of daylight today!]]></item>
+        <item><![CDATA[Smile! Today has <font color={color}>{numMinutes} more {minutes}</font> of daylight than yesterday!]]></item>
+        <item><![CDATA[<font color={color}>{numMinutes} more {minutes}</font> of daylight today. Just let it sink in…]]></item>
+        <item><![CDATA[Today is <font color={color}>{numMinutes} {minutes} longer</font>. It\'s getting better and better!]]></item>
+        <item><![CDATA[Bring out your shorts, because today has <font color={color}>{numMinutes} more {minutes}</font> of sunlight.]]></item>
+        <item><![CDATA[Have a great day and enjoy those <font color={color}>{numMinutes} extra {minutes}</font> of daylight.]]></item>
+        <item><![CDATA[After darkness comes daylight. <font color={color}>{numMinutes} more {minutes}</font> to be precise!]]></item>
     </string-array>
+
+    <string-array name="daily_messages_negative">
+        <item><![CDATA[The sun will be out <font color={color}>{numMinutes} {minutes} less</font> today. Keep your head up!]]></item>
+        <item><![CDATA[<font color={color}>{numMinutes} {minutes} less</font> sunlight today, unfortunately. It\'ll get better!]]></item>
+        <item><![CDATA[Sadly, the day will be <font color={color}>{numMinutes} {minutes} shorter</font>. Make the most out of it!]]></item>
+    </string-array>
+
+    <string-array name="daily_messages_no_change">
+        <item><![CDATA[Little less than <font color={color}>a minute</font> of extra sunlight today. It\'s getting better!]]></item>
+        <item><![CDATA[We\'ve reached the tipping point: we\'ll have more sunlight every day now!]]></item>
+        <item><![CDATA[<font color={color}>About a minute</font> of extra light. You\'ll start noticing the difference soon!]]></item>
+        <item><![CDATA[There\'s <font color={color}>about a minute</font> of extra light at the end of this tunnel.]]></item>
+        <item><![CDATA[We\'ll have <font color={color}>about a minute</font> of extra light today. It\'s upwards from here.]]></item>
+    </string-array>
+
+    <string-array name="night_messages_positive">
+        <item><![CDATA[Get a good night\'s sleep: tomorrow there\'ll be <font color={color}>{numMinutes} more {minutes}</font> of sunlight.]]></item>
+        <item><![CDATA[Lights out. Enjoy <font color={color}>{numMinutes} more {minutes}</font> of sunlight tomorrow!]]></item>
+        <item><![CDATA[Bring out those pyjamas. <font color={color}>{numMinutes} more {minutes}</font> of light await tomorrow.]]></item>
+        <item><![CDATA[The sun has set for today. Embrace those <font color={color}>{numMinutes} {minutes}</font> of extra daylight tomorrow.]]></item>
+        <item><![CDATA[The sun has set. Soak up the extra vitamin D tomorrow!]]></item>
+    </string-array>
+
+    <string-array name="night_messages_negative">
+        <item><![CDATA[Get a good night\'s sleep: tomorrow there\'ll be <font color={color}>{numMinutes} more {minutes}</font> of sunlight.]]></item>
+        <item><![CDATA[Lights out. Enjoy <font color={color}>{numMinutes} more {minutes}</font> of sunlight tomorrow!]]></item>
+        <item><![CDATA[Bring out those pyjamas. <font color={color}>{numMinutes} more {minutes}</font> of light await tomorrow.]]></item>
+        <item><![CDATA[The sun has set for today. Embrace those <font color={color}>{numMinutes} {minutes}</font> of extra daylight tomorrow.]]></item>
+        <item><![CDATA[The sun has set. Soak up the extra vitamin D tomorrow!]]></item>
+    </string-array>
+
 </resources>
