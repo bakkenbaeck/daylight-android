@@ -7,6 +7,8 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -137,10 +139,19 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
     private void showNotification(final String todaysMessage) {
         final Intent resultIntent = new Intent(this, SunActivity.class);
         final PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        final Bitmap largeIcon = BitmapFactory.decodeResource(getResources(), R.mipmap.daylight_icon);
+        final String contentText = stripHtml(todaysMessage);
+        final NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle()
+                .setBigContentTitle(getResources().getString(R.string.app_name))
+                .bigText(contentText);
         final NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.mipmap.daylight_notification_icon)
-                        .setContentText(stripHtml(todaysMessage))
+                        .setLargeIcon(largeIcon)
+                        .setContentTitle(getResources().getString(R.string.app_name))
+                        .setContentText(contentText)
+                        .setAutoCancel(true)
+                        .setStyle(bigTextStyle)
                         .setContentIntent(resultPendingIntent);
         final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         notificationManager.notify(1, mBuilder.build());
