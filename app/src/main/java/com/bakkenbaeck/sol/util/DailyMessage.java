@@ -23,8 +23,8 @@ public class DailyMessage {
         final CurrentPhase phase = threeDayPhases.getCurrentPhase();
         final String phaseName = phase.getName();
 
-        final String nightPhaseName = SunPhase.all().get(ThreeDayPhases.NIGHT).getName().toString();
-        final Calendar dayLengthChange = phaseName.equals(nightPhaseName)
+        final boolean isNight = isNight(phaseName);
+        final Calendar dayLengthChange = isNight
                 ? threeDayPhases.getDayLengthChangeBetweenTodayAndTomorrow()
                 : threeDayPhases.getDayLengthChangeBetweenTodayAndYesterday();
 
@@ -52,35 +52,38 @@ public class DailyMessage {
     }
 
     private String[] getMessageArray(final int minutes, final boolean isDayGettingLonger, final String phaseName) {
-        final String nightPhaseName = SunPhase.all().get(ThreeDayPhases.NIGHT).getName().toString();
+        final boolean isNight = isNight(phaseName);
         final boolean isLessThanAMinute = minutes == 0;
-        final boolean isNight = phaseName.equals(nightPhaseName);
-
-        int messageArrayRef;
+        final int messageArrayRef;
 
         if (isLessThanAMinute) {
-            if (isNight && isDayGettingLonger) {
-                messageArrayRef = R.array.night_messages_positive_less_than_one_minute;
-            } else if (isNight && !isDayGettingLonger) {
-                messageArrayRef = R.array.night_messages_negative_less_than_one_minute;
-            } else if (!isNight && isDayGettingLonger) {
-                messageArrayRef = R.array.daily_messages_positive_less_than_one_minute;
+            if (isNight) {
+                messageArrayRef = isDayGettingLonger
+                        ? R.array.night_messages_positive_less_than_one_minute
+                        : R.array.night_messages_negative_less_than_one_minute;
             } else {
-                messageArrayRef = R.array.daily_messages_negative_less_than_one_minute;
+                messageArrayRef = isDayGettingLonger
+                        ? R.array.day_messages_positive_less_than_one_minute
+                        : R.array.day_messages_negative_less_than_one_minute;
             }
         } else {
-            if (isNight && isDayGettingLonger) {
-                messageArrayRef = R.array.night_messages_positive;
-            } else if (isNight && !isDayGettingLonger) {
-                messageArrayRef = R.array.night_messages_negative;
-            } else if (!isNight && isDayGettingLonger) {
-                messageArrayRef = R.array.daily_messages_positive;
+            if (isNight) {
+                messageArrayRef = isDayGettingLonger
+                        ? R.array.night_messages_positive
+                        : R.array.night_messages_negative;
             } else {
-                messageArrayRef = R.array.daily_messages_negative;
+                messageArrayRef = isDayGettingLonger
+                        ? R.array.day_messages_positive
+                        : R.array.day_messages_negative;
             }
         }
 
         return context.getResources().getStringArray(messageArrayRef);
+    }
+
+    private boolean isNight(final String phaseName) {
+        final String nightPhaseName = SunPhase.all().get(ThreeDayPhases.NIGHT).getName().toString();
+        return phaseName.equals(nightPhaseName);
     }
 
     private String plural(final int minutes) {

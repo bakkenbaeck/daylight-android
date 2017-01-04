@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="daily_messages_positive">
+    <string-array name="day_messages_positive">
         <item><![CDATA[Today is <font color={color}>{numMinutes} {minutes}</font> longer than yesterday. Happy days!]]></item>
         <item><![CDATA[The sun is out for <font color={color}>{numMinutes} more {minutes}</font> today. Enjoy!]]></item>
         <item><![CDATA[<font color={color}>{numMinutes} extra {minutes}</font> of sunshine today. Make them count!]]></item>
@@ -13,19 +13,19 @@
         <item><![CDATA[After darkness comes daylight. <font color={color}>{numMinutes} more {minutes}</font> to be precise!]]></item>
     </string-array>
 
-    <string-array name="daily_messages_negative">
+    <string-array name="day_messages_negative">
         <item><![CDATA[The sun will be out <font color={color}>{numMinutes} {minutes} less</font> today. Keep your head up!]]></item>
         <item><![CDATA[<font color={color}>{numMinutes} {minutes} less</font> sunlight today, unfortunately. It\'ll get better!]]></item>
         <item><![CDATA[Sadly, the day will be <font color={color}>{numMinutes} {minutes} shorter</font>. Make the most out of it!]]></item>
     </string-array>
 
-    <string-array name="daily_messages_negative_less_than_one_minute">
+    <string-array name="day_messages_negative_less_than_one_minute">
         <item><![CDATA[Unfortunately, the day is a little bit shorter today. Make the most out of it!]]></item>
         <item><![CDATA[Sadly, today is a tiny bit shorter than yesterday. Enjoy it while it lasts!]]></item>
         <item><![CDATA[Today is shorter than yesterday. But fear not, brighter times ahead!]]></item>
     </string-array>
 
-    <string-array name="daily_messages_positive_less_than_one_minute">
+    <string-array name="day_messages_positive_less_than_one_minute">
         <item><![CDATA[Little less than <font color={color}>a minute</font> of extra sunlight today. It\'s getting better!]]></item>
         <item><![CDATA[We\'ve reached the tipping point: we\'ll have more sunlight every day now!]]></item>
         <item><![CDATA[<font color={color}>About a minute</font> of extra light. You\'ll start noticing the difference soon!]]></item>

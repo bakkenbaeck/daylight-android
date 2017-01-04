@@ -97,14 +97,14 @@ public class SunsetService extends Service implements GoogleApiClient.Connection
         final String todaysMessage = this.dailyMessage.generate(threeDayPhases);
         final String locationMessage = this.dailyMessage.getLocation(safeLocation.getLatitude(), safeLocation.getLongitude());
 
-        final Intent intentUpdate = new Intent();
-        intentUpdate.setAction(ACTION_UPDATE);
-        intentUpdate.addCategory(Intent.CATEGORY_DEFAULT);
-        intentUpdate.putExtra(EXTRA_DAILY_MESSAGE, todaysMessage);
-        intentUpdate.putExtra(EXTRA_SUNRISE_TIME, threeDayPhases.getTodaysSunriseAsLong());
-        intentUpdate.putExtra(EXTRA_SUNSET_TIME, threeDayPhases.getTodaysSunsetAsLong());
-        intentUpdate.putExtra(EXTRA_LOCATION_MESSAGE, locationMessage);
-        intentUpdate.putExtra(EXTRA_CURRENT_PHASE, currentPhaseName);
+        final Intent intentUpdate = new Intent()
+                .setAction(ACTION_UPDATE)
+                .addCategory(Intent.CATEGORY_DEFAULT)
+                .putExtra(EXTRA_DAILY_MESSAGE, todaysMessage)
+                .putExtra(EXTRA_SUNRISE_TIME, threeDayPhases.getTodaysSunriseAsLong())
+                .putExtra(EXTRA_SUNSET_TIME, threeDayPhases.getTodaysSunsetAsLong())
+                .putExtra(EXTRA_LOCATION_MESSAGE, locationMessage)
+                .putExtra(EXTRA_CURRENT_PHASE, currentPhaseName);
 
         sendBroadcast(intentUpdate);
 
