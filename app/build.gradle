@@ -30,7 +30,7 @@ dependencies {
             // Support
             'com.android.support:appcompat-v7:25.0.1',
             // Google Play -- Location
-            'com.google.android.gms:play-services-location:10.0.0',
+            'com.google.android.gms:play-services-location:10.0.1',
             // Prettyness
             'uk.co.chrisjenx:calligraphy:2.2.0',
             'com.github.bakkenbaeck.sunviewlib:sunviewlib:v1.0.2'
