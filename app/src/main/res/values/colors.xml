@@ -22,11 +22,11 @@
     <color name="daylight_text">#99A04C2C</color>
     <color name="sunset_text">#99A04C2C</color>
     <color name="twilight_text">#9940589B</color>
-    <color name="night_text">#99A04C2C</color>
+    <color name="night_text">#9990CFEF</color>
 
     <color name="sunrise_text2">#DB6028</color>
     <color name="daylight_text2">#A04C2C</color>
     <color name="sunset_text2">#A04C2C</color>
     <color name="twilight_text2">#40589B</color>
-    <color name="night_text2">#A04C2C</color>
+    <color name="night_text2">#90CFEF</color>
 </resources>
