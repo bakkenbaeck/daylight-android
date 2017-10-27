@@ -18,4 +18,5 @@
     <string name="dd_mm_yy">dd. MM. yyyy</string>
     <string name="start__permission_description"><![CDATA[Hi! Daylight uses your <font color={color}>location</font> to give you accurate daylight information.]]></string>
     <string name="start__call_to_action">Tap to continue</string>
+    <string name="widget__location_permission">Click to enable your location</string>
 </resources>

@@ -1,5 +1,6 @@
 package com.bakkenbaeck.sol.widget;
 
+import android.Manifest;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.BroadcastReceiver;
@@ -7,7 +8,9 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.widget.LinearLayout;
 import android.widget.RemoteViews;
@@ -58,7 +61,21 @@ public class DashboardWidget extends AppWidgetProvider {
             final ComponentName componentName = new ComponentName(context, DashboardWidget.class);
             setTodaysMessage(context, views, uvd);
             setSunView(context, views, uvd);
+            setLocationPermissionMessage(context, views, uvd);
             appWidgetManager.updateAppWidget(appWidgetManager.getAppWidgetIds(componentName), views);
+        }
+
+        private void setLocationPermissionMessage(
+                final Context context,
+                final RemoteViews views,
+                final UserVisibleData uvd) {
+            final boolean locationPermissionGranted = ActivityCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+            final int visibility = locationPermissionGranted ? View.GONE : View.VISIBLE;
+            final int secColor = uvd.getCurrentPhase().getSecondaryColor();
+            views.setViewVisibility(R.id.location_message, visibility);
+            views.setTextColor(R.id.location_message, ContextCompat.getColor(context, secColor));
         }
 
         private void setSunView(
