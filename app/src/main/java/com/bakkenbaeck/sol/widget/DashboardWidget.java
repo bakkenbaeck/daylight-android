@@ -1,6 +1,7 @@
 package com.bakkenbaeck.sol.widget;
 
 import android.Manifest;
+import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.BroadcastReceiver;
@@ -12,19 +13,19 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RemoteViews;
 
 import com.bakkenbaeck.sol.R;
 import com.bakkenbaeck.sol.service.SunsetService;
+import com.bakkenbaeck.sol.ui.StartActivity;
 import com.bakkenbaeck.sol.util.UserVisibleData;
 import com.bakkenbaeck.sunviewlib.SunView;
 
 public class DashboardWidget extends AppWidgetProvider {
 
-    static void updateAppWidget(final Context context,
-                                final AppWidgetManager appWidgetManager,
-                                final int appWidgetId) {
+    static void updateAppWidget(final Context context) {
         registerForSunPhaseChanges(context);
         startSunsetService(context);
     }
@@ -40,7 +41,7 @@ public class DashboardWidget extends AppWidgetProvider {
                          final AppWidgetManager appWidgetManager,
                          final int[] appWidgetIds) {
         for (int appWidgetId : appWidgetIds) {
-            updateAppWidget(context, appWidgetManager, appWidgetId);
+            updateAppWidget(context);
         }
     }
 
@@ -62,6 +63,7 @@ public class DashboardWidget extends AppWidgetProvider {
             setTodaysMessage(context, views, uvd);
             setSunView(context, views, uvd);
             setLocationPermissionMessage(context, views, uvd);
+            makeWidgetClickable(context, views);
             appWidgetManager.updateAppWidget(appWidgetManager.getAppWidgetIds(componentName), views);
         }
 
@@ -118,6 +120,12 @@ public class DashboardWidget extends AppWidgetProvider {
             sunView.setDrawingCacheEnabled(true);
             final Bitmap bitmap = sunView.getDrawingCache();
             views.setImageViewBitmap(R.id.sun_view, bitmap);
+        }
+
+        private void makeWidgetClickable(final Context context, final RemoteViews views) {
+            final Intent intent = new Intent(context, StartActivity.class);
+            final PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+            views.setOnClickPendingIntent(R.id.widget_container, pendingIntent);
         }
     }
 }
