@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Daylight</string>
     <string name="notifications">NOTIFICATIONS</string>
-    <string name="default_city">your location</string>
+    <string name="default_city">Your location</string>
     <string name="more">more</string>
     <string name="less">less</string>
     <string name="presentTense">has</string>
