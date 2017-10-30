@@ -60,11 +60,18 @@ public class DashboardWidget extends AppWidgetProvider {
             final RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.dashboard_widget);
             final AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
             final ComponentName componentName = new ComponentName(context, DashboardWidget.class);
+            setBackground(views, uvd);
             setTodaysMessage(context, views, uvd);
             setSunView(context, views, uvd);
             setLocationPermissionMessage(context, views, uvd);
             makeWidgetClickable(context, views);
             appWidgetManager.updateAppWidget(appWidgetManager.getAppWidgetIds(componentName), views);
+        }
+
+        private void setBackground(final RemoteViews views,
+                                   final UserVisibleData uvd) {
+            final int color = uvd.getCurrentPhase().getBackgroundColor();
+            views.setInt(R.id.widget_container, "setBackgroundResource", color);
         }
 
         private void setLocationPermissionMessage(
