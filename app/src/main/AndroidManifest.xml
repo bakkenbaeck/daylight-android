@@ -5,6 +5,8 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
+    <uses-feature android:name="android.software.live_wallpaper" />
+
     <application
         android:name=".BaseApplication"
         android:allowBackup="true"
@@ -49,6 +51,20 @@
         <service
             android:name=".service.SunsetService"
             android:exported="false"/>
+
+        <service
+            android:name=".wallpaper.LiveWallpaper"
+            android:enabled="true"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_WALLPAPER">
+            <intent-filter>
+                <action android:name="android.service.wallpaper.WallpaperService" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.service.wallpaper"
+                android:resource="@xml/wallpaper_info"/>
+        </service>
 
         <receiver android:name=".widget.DashboardWidget">
             <intent-filter>
