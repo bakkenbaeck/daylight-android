@@ -15,18 +15,15 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.text.Html;
-import android.text.Spanned;
 import android.view.View;
 
 import com.bakkenbaeck.sol.R;
 import com.bakkenbaeck.sol.databinding.ActivitySunBinding;
 import com.bakkenbaeck.sol.service.SunsetService;
 import com.bakkenbaeck.sol.service.TimeReceiver;
-import com.bakkenbaeck.sol.util.CurrentPhase;
+import com.bakkenbaeck.sol.util.UserVisibleData;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -88,46 +85,20 @@ public class SunActivity extends BaseActivity {
     private class SunsetBroadcastReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(final Context context, final Intent intent) {
-            final String todaysMessage = intent.getStringExtra(SunsetService.EXTRA_DAILY_MESSAGE);
-            final Spanned todaysMessageFormatted = convertToHtml(todaysMessage);
-
-            final long sunriseTime = intent.getLongExtra(SunsetService.EXTRA_SUNRISE_TIME, 0);
-            final long sunsetTime = intent.getLongExtra(SunsetService.EXTRA_SUNSET_TIME, 0);
-            final String locationMessage = intent.getStringExtra(SunsetService.EXTRA_LOCATION_MESSAGE);
-            final CurrentPhase currentPhase = new CurrentPhase(intent.getStringExtra(SunsetService.EXTRA_CURRENT_PHASE));
-
-            final SimpleDateFormat sdf = new SimpleDateFormat(getString(R.string.hh_mm), Locale.getDefault());
-            final String sunriseText = sdf.format(sunriseTime);
-            final String sunsetText = sdf.format(sunsetTime);
-
-            updateView(todaysMessageFormatted, sunriseText, sunsetText, locationMessage,
-                    currentPhase, sunriseTime, sunsetTime);
-        }
-
-        private Spanned convertToHtml(final String message) {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                return Html.fromHtml(message, Html.FROM_HTML_MODE_LEGACY);
-            } else {
-                return Html.fromHtml(message);
-            }
+            final UserVisibleData uvd = new UserVisibleData(context, intent);
+            updateView(uvd);
         }
     }
 
-    private void updateView(final Spanned todaysText,
-                            final String sunriseTime,
-                            final String sunsetTime,
-                            final String locationMessage,
-                            final CurrentPhase currentPhase,
-                            final long sunriseStart,
-                            final long sunsetEnd) {
+    private void updateView(final UserVisibleData uvd) {
 
         if (this.binding == null) {
             return;
         }
 
-        final int color = currentPhase.getBackgroundColor();
-        final int secColor = currentPhase.getSecondaryColor();
-        final int priColor = currentPhase.getPrimaryColor();
+        final int color = uvd.getCurrentPhase().getBackgroundColor();
+        final int secColor = uvd.getCurrentPhase().getSecondaryColor();
+        final int priColor = uvd.getCurrentPhase().getPrimaryColor();
 
         final SimpleDateFormat sdf = new SimpleDateFormat(getString(R.string.hh_mm), Locale.getDefault());
 
@@ -153,16 +124,16 @@ public class SunActivity extends BaseActivity {
                     .start();
         }
 
-        this.binding.todaysMessage.setText(todaysText);
+        this.binding.todaysMessage.setText(uvd.getTodaysMessage());
         this.binding.todaysMessage.setTextColor(ContextCompat.getColor(this, secColor));
         this.binding.location.setTextColor(ContextCompat.getColor(this, secColor));
 
         this.binding.share.setTextColor(ContextCompat.getColor(this, secColor));
-        this.binding.location.setText(locationMessage);
+        this.binding.location.setText(uvd.getLocationMessage());
 
         this.binding.sunView.setColor(ContextCompat.getColor(this, priColor));
-        this.binding.sunView.setStartLabel(sunriseTime);
-        this.binding.sunView.setEndLabel(sunsetTime);
+        this.binding.sunView.setStartLabel(uvd.getSunriseText());
+        this.binding.sunView.setEndLabel(uvd.getSunsetText());
         this.binding.title.setTextColor(ContextCompat.getColor(this, secColor));
         this.binding.sunCircle.setColorFilter(ContextCompat.getColor(this, secColor), PorterDuff.Mode.SRC);
         this.binding.sunView.setFloatingLabel(sdf.format(new Date()));
@@ -174,19 +145,15 @@ public class SunActivity extends BaseActivity {
         this.binding.titleWrapper.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showInfoActivity(currentPhase.getName());
+                showInfoActivity(uvd.getCurrentPhase().getName());
             }
         });
 
-        final long span = sunsetEnd - sunriseStart;
-        final long current = Calendar.getInstance().getTimeInMillis() - sunriseStart;
-        final double progress = (double) current / (double) span;
-
         binding.sunView.setColor(ContextCompat.getColor(this, priColor))
-                .setStartLabel(sunriseTime)
-                .setEndLabel(sunsetTime)
+                .setStartLabel(uvd.getSunriseText())
+                .setEndLabel(uvd.getSunsetText())
                 .setFloatingLabel(sdf.format(new Date()))
-                .setPercentProgress(progress);
+                .setPercentProgress(uvd.getProgress());
 
         firstTime = false;
     }

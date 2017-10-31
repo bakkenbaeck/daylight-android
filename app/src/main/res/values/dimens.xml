@@ -12,4 +12,8 @@
     <dimen name="sun_radius">8dp</dimen>
     <dimen name="sun_text_size">12sp</dimen>
     <dimen name="sun_stroke_width">1dp</dimen>
+
+    <dimen name="widget_margin">8dp</dimen>
+    <dimen name="widget_width">240dp</dimen>
+    <dimen name="widget_height">80dp</dimen>
 </resources>
