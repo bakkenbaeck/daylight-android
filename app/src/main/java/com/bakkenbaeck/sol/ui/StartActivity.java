@@ -45,7 +45,7 @@ public class StartActivity extends BaseActivity {
     private void assignClickListeners() {
         ActivityStartBinding binding  = DataBindingUtil.setContentView(this, R.layout.activity_start);
         binding.infoMessage.setText(convertToHtml(getRequestLocationMessage()));
-        binding.getRoot().setOnClickListener(new View.OnClickListener() {
+        binding.root.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 ActivityCompat.requestPermissions(StartActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
