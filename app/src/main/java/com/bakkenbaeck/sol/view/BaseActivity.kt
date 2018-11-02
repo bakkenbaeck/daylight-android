@@ -1,4 +1,4 @@
-package com.bakkenbaeck.sol.ui
+package com.bakkenbaeck.sol.view
 
 
 import android.content.Context

@@ -13,7 +13,7 @@
         android:orientation="vertical"
         android:paddingTop="24dp"
         android:background="@color/daylight"
-        tools:context="com.bakkenbaeck.sol.ui.SunActivity">
+        tools:context="com.bakkenbaeck.sol.view.SunActivity">
 
         <LinearLayout
             android:id="@+id/titleWrapper"

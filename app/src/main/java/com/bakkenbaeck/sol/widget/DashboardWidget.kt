@@ -10,7 +10,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.view.View
@@ -19,7 +18,7 @@ import android.widget.RemoteViews
 
 import com.bakkenbaeck.sol.R
 import com.bakkenbaeck.sol.service.SunsetService
-import com.bakkenbaeck.sol.ui.StartActivity
+import com.bakkenbaeck.sol.view.StartActivity
 import com.bakkenbaeck.sol.util.UserVisibleData
 import com.bakkenbaeck.sunviewlib.SunView
 

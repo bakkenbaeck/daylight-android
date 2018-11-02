@@ -4,27 +4,24 @@ package com.bakkenbaeck.sol.service
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.app.Service
-import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.location.Location
-import android.os.Bundle
 import android.os.IBinder
 import android.support.v4.app.NotificationCompat
 import android.text.Html
-
 import com.bakkenbaeck.sol.R
 import com.bakkenbaeck.sol.extension.getAlarmService
 import com.bakkenbaeck.sol.extension.getNotificationService
-import com.bakkenbaeck.sol.ui.SunActivity
+import com.bakkenbaeck.sol.view.SunActivity
 import com.bakkenbaeck.sol.util.DailyMessage
 import com.bakkenbaeck.sol.util.SolPreferences
 import com.bakkenbaeck.sol.util.ThreeDayPhases
-import com.google.android.gms.common.ConnectionResult
-import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.FusedLocationProviderClient
 
-class SunsetService : Service(), GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+
+class SunsetService : Service() {
 
     companion object {
         const val ACTION_UPDATE = "com.example.androidintentservice.UPDATE"
@@ -36,48 +33,33 @@ class SunsetService : Service(), GoogleApiClient.ConnectionCallbacks, GoogleApiC
         const val EXTRA_SHOW_NOTIFICATION = "show_notification"
     }
 
-    private val googleApiClient: GoogleApiClient by lazy { createGoogleApiClient() }
+    private val locationClient by lazy { createGoogleApiClient() }
     private val dailyMessage: DailyMessage by lazy { DailyMessage(this) }
     private val prefs: SolPreferences by lazy { SolPreferences(this) }
 
     private var shouldTryAndShowNotification: Boolean = false
     private var lastRefreshTime: Long = 0
 
-    private fun createGoogleApiClient(): GoogleApiClient {
-        return GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build()
+    private fun createGoogleApiClient(): FusedLocationProviderClient {
+        return LocationServices.getFusedLocationProviderClient(this)
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         shouldTryAndShowNotification = intent.getBooleanExtra(EXTRA_SHOW_NOTIFICATION, false)
-        googleApiClient.connect()
+
+        try {
+            locationClient.lastLocation.addOnCompleteListener {
+                updateLocation(it.result)
+            }
+        } catch (ex: SecurityException) {
+            updateLocation(null)
+        }
+
         return super.onStartCommand(intent, flags, startId)
     }
 
     override fun onBind(intent: Intent): IBinder? {
         return null
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        this.googleApiClient.disconnect()
-    }
-
-    override fun onConnected(bundle: Bundle?) {
-        getUsersLocation()
-    }
-
-    private fun getUsersLocation() {
-        try {
-            val currentLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient)
-            updateLocation(currentLocation)
-        } catch (ex: SecurityException) {
-            updateLocation(null)
-        }
-
     }
 
     private fun updateLocation(location: Location?) {
@@ -183,10 +165,4 @@ class SunsetService : Service(), GoogleApiClient.ConnectionCallbacks, GoogleApiC
     }
 
     private fun stripHtml(html: String): String = Html.fromHtml(html).toString()
-
-    override fun onConnectionSuspended(i: Int) {}
-
-    override fun onConnectionFailed(connectionResult: ConnectionResult) {
-        updateLocation(null)
-    }
 }

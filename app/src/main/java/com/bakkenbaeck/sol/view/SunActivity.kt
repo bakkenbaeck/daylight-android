@@ -1,23 +1,19 @@
-package com.bakkenbaeck.sol.ui
+package com.bakkenbaeck.sol.view
 
-import android.Manifest
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.PackageManager
 import android.graphics.PorterDuff
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.widget.TextView
 import com.bakkenbaeck.sol.R
 import com.bakkenbaeck.sol.extension.startActivityWithTransition
 import com.bakkenbaeck.sol.extension.animate
-import com.bakkenbaeck.sol.extension.isLocationPermissionGranted
 import com.bakkenbaeck.sol.extension.requireLocationPermission
 import com.bakkenbaeck.sol.service.SunsetService
 import com.bakkenbaeck.sol.service.TimeReceiver

@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        tools:context="com.bakkenbaeck.sol.ui.SunActivity"
+        tools:context="com.bakkenbaeck.sol.view.SunActivity"
         android:paddingTop="24dp"
         android:background="@color/daylight">
 

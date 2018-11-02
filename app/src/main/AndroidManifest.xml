@@ -16,19 +16,19 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".ui.SunActivity"
+            android:name=".view.SunActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:resizeableActivity="true"/>
 
         <activity
-            android:name=".ui.InfoActivity"
+            android:name=".view.InfoActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:resizeableActivity="true"/>
         
         <activity
-            android:name=".ui.StartActivity"
+            android:name=".view.StartActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:resizeableActivity="true">
