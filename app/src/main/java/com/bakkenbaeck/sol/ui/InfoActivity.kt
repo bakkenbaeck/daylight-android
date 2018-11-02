@@ -29,6 +29,14 @@ class InfoActivity : BaseActivity() {
 
     companion object {
         const val PHASE_NAME = "phase_name"
+
+        private val color2drawable = mapOf(
+                R.color.sunrise_text to R.drawable.half_circle_sunrise,
+                R.color.daylight_text to R.drawable.half_circle_daylight,
+                R.color.sunset_text to R.drawable.half_circle_daylight,
+                R.color.twilight_text to R.drawable.half_circle_twilight,
+                R.color.night_text to R.drawable.half_circle_night
+        )
     }
 
     private var sunsetBroadcastReceiver: SunsetBroadcastReceiver? = null
@@ -71,7 +79,7 @@ class InfoActivity : BaseActivity() {
         notificationText.setTextColor(ContextCompat.getColor(this, secColor))
         notificationValue.setTextColor(ContextCompat.getColor(this, priColor))
 
-        val colorFrom = (root.getBackground() as ColorDrawable).color
+        val colorFrom = (root.background as ColorDrawable).color
         val colorTo = ContextCompat.getColor(this, color)
 
         if (animateBackground) {
@@ -85,17 +93,14 @@ class InfoActivity : BaseActivity() {
 
     private fun initNotificationsToggle() {
         val solPrefs = SolPreferences(this)
-        this.notificationEnabled = solPrefs.showNotification
-
-        val s = if (notificationEnabled) getString(R.string.off) else getString(R.string.on)
-        notificationValue.setText(s)
+        notificationEnabled = solPrefs.showNotification
+        notificationValue.text = getNotificationStatusText()
     }
 
     private fun assignClickListeners() {
         notificationWrapper.setOnClickListener {
             notificationEnabled = !notificationEnabled
-            val s = if (notificationEnabled) getString(R.string.off) else getString(R.string.on)
-            notificationValue.setText(s)
+            notificationValue.text = getNotificationStatusText()
 
             val solPrefs = SolPreferences(this@InfoActivity)
             solPrefs.showNotification = notificationEnabled
@@ -105,6 +110,10 @@ class InfoActivity : BaseActivity() {
             finish()
             overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
         }
+    }
+
+    private fun getNotificationStatusText(): String {
+        return if (notificationEnabled) getString(R.string.off) else getString(R.string.on)
     }
 
     private fun registerForSunPhaseChanges() {
@@ -122,38 +131,23 @@ class InfoActivity : BaseActivity() {
 
     private fun setSunDrawable(currentPhase: CurrentPhase) {
         val color = currentPhase.secondaryColor
+        val drawable = color2drawable[color] ?: return
+        setSunDrawable(drawable)
+    }
 
-        when (color) {
-            R.color.sunrise_text -> {
-                sunCircle.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.half_circle_sunrise))
-            }
-            R.color.daylight_text -> {
-                sunCircle.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.half_circle_daylight))
-            }
-            R.color.sunset_text -> {
-                sunCircle.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.half_circle_daylight))
-            }
-            R.color.twilight_text -> {
-                sunCircle.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.half_circle_twilight))
-            }
-            R.color.night_text -> {
-                sunCircle.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.half_circle_night))
-            }
-        }
+    private fun setSunDrawable(resourceId: Int) {
+        val drawable = ContextCompat.getDrawable(this, resourceId)
+        sunCircle.setImageDrawable(drawable)
     }
 
     private fun animateBackground(colorFrom: Int, colorTo: Int) {
-        if (colorFrom == colorTo) {
-            return
-        }
+        if (colorFrom == colorTo) return
 
-        val colorAnimation = ValueAnimator.ofObject(ArgbEvaluator(), colorFrom, colorTo)
-        colorAnimation.duration = 400
-        colorAnimation.addUpdateListener { animator ->
-            val color = animator.animatedValue as Int
-            root.setBackgroundColor(color)
+        ValueAnimator.ofObject(ArgbEvaluator(), colorFrom, colorTo).apply {
+            duration = 400
+            addUpdateListener { root.setBackgroundColor(it.animatedValue as Int) }
+            start()
         }
-        colorAnimation.start()
     }
 
     private fun convertToHtml(message: String): Spanned {
@@ -174,9 +168,8 @@ class InfoActivity : BaseActivity() {
     override fun onDestroy() {
         super.onDestroy()
 
-        if (sunsetBroadcastReceiver != null) {
-            unregisterReceiver(sunsetBroadcastReceiver)
-            sunsetBroadcastReceiver = null
-        }
+        if (sunsetBroadcastReceiver == null) return
+        unregisterReceiver(sunsetBroadcastReceiver)
+        sunsetBroadcastReceiver = null
     }
 }

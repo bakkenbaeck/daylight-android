@@ -9,6 +9,9 @@ import android.support.v4.content.ContextCompat
 import android.text.Html
 import android.text.Spanned
 import com.bakkenbaeck.sol.R
+import com.bakkenbaeck.sol.extension.isLocationPermissionGranted
+import com.bakkenbaeck.sol.extension.requestLocationPermission
+import com.bakkenbaeck.sol.extension.startActivityAndFinish
 import kotlinx.android.synthetic.main.activity_start.infoMessage
 import kotlinx.android.synthetic.main.activity_start.root
 
@@ -18,12 +21,11 @@ class StartActivity : BaseActivity() {
         private const val PERMISSION_REQUEST_CODE_LOCATION = 123
     }
 
-    private val requestLocationMessage: String
-        get() {
-            val message = getString(R.string.start__permission_description)
-            val color = ContextCompat.getColor(this, R.color.daylight_text2)
-            return message.replace("{color}", color.toString())
-        }
+    private val requestLocationMessage: String by lazy {
+        val message = getString(R.string.start__permission_description)
+        val color = ContextCompat.getColor(this, R.color.daylight_text2)
+        return@lazy message.replace("{color}", color.toString())
+    }
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,20 +52,15 @@ class StartActivity : BaseActivity() {
 
     private fun assignClickListeners() {
         infoMessage.text = convertToHtml(requestLocationMessage)
-        root.setOnClickListener {
-            ActivityCompat.requestPermissions(this@StartActivity, arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION),
-                    PERMISSION_REQUEST_CODE_LOCATION)
-        }
+        root.setOnClickListener { requestLocationPermission(PERMISSION_REQUEST_CODE_LOCATION) }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>,
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>,
                                             grantResults: IntArray) {
-        if (requestCode == PERMISSION_REQUEST_CODE_LOCATION && grantResults.size == 1
-                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            val intent = Intent(this, SunActivity::class.java)
-            startActivity(intent)
-            finish()
-            overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+
+        if (requestCode == PERMISSION_REQUEST_CODE_LOCATION && isLocationPermissionGranted()) {
+            startActivityAndFinish<SunActivity>()
         }
     }
 

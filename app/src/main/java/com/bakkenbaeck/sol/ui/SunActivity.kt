@@ -15,6 +15,10 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.widget.TextView
 import com.bakkenbaeck.sol.R
+import com.bakkenbaeck.sol.extension.startActivityWithTransition
+import com.bakkenbaeck.sol.extension.animate
+import com.bakkenbaeck.sol.extension.isLocationPermissionGranted
+import com.bakkenbaeck.sol.extension.requireLocationPermission
 import com.bakkenbaeck.sol.service.SunsetService
 import com.bakkenbaeck.sol.service.TimeReceiver
 import com.bakkenbaeck.sol.util.UserVisibleData
@@ -37,8 +41,8 @@ class SunActivity : BaseActivity() {
         private const val FONT_PATH = "fonts/gtamericalight.ttf"
     }
 
-    private var sunsetBroadcastReceiver: SunsetBroadcastReceiver? = null
-    private var timeReceiver: TimeReceiver? = null
+    private val sunsetBroadcastReceiver = SunsetBroadcastReceiver()
+    private val timeReceiver = TimeReceiver()
     private var firstTime = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,32 +50,35 @@ class SunActivity : BaseActivity() {
         setContentView(R.layout.activity_sun)
 
         init()
-        checkForLocationPermission()
     }
 
     private fun init() {
-        this.sunsetBroadcastReceiver = SunsetBroadcastReceiver()
+        initTypeface()
+        initTimeReceiver()
+        checkForLocationPermission()
+    }
+
+    private fun initTypeface() {
         val loadedTypeface = TypefaceUtils.load(assets, FONT_PATH)
         sunView.setTypeface(loadedTypeface)
-        registerTimeReceiver()
+    }
+
+    private fun initTimeReceiver() {
+        this.registerReceiver(timeReceiver, IntentFilter(Intent.ACTION_TIME_TICK))
     }
 
     private fun checkForLocationPermission() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), PERMISSION_REQUEST_CODE)
-        } else {
+        requireLocationPermission(PERMISSION_REQUEST_CODE) {
             startLocationService()
         }
     }
 
-    private fun registerTimeReceiver() {
-        this.timeReceiver = TimeReceiver()
-        this.registerReceiver(this.timeReceiver, IntentFilter(Intent.ACTION_TIME_TICK))
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>,
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>,
                                             grantResults: IntArray) {
-        startLocationService()
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            startLocationService()
+        }
     }
 
     private fun startLocationService() {
@@ -80,7 +87,7 @@ class SunActivity : BaseActivity() {
 
         val intentFilter = IntentFilter(SunsetService.ACTION_UPDATE)
         intentFilter.addCategory(Intent.CATEGORY_DEFAULT)
-        registerReceiver(this.sunsetBroadcastReceiver, intentFilter)
+        registerReceiver(sunsetBroadcastReceiver, intentFilter)
     }
 
     private inner class SunsetBroadcastReceiver : BroadcastReceiver() {
@@ -91,95 +98,80 @@ class SunActivity : BaseActivity() {
     }
 
     private fun updateView(uvd: UserVisibleData) {
-        val color = uvd.currentPhase.backgroundColor
-        val secColor = uvd.currentPhase.secondaryColor
-        val priColor = uvd.currentPhase.primaryColor
+        val primaryColor = ContextCompat.getColor(this, uvd.currentPhase.primaryColor)
+        val secondaryColor = ContextCompat.getColor(this, uvd.currentPhase.secondaryColor)
+        val backgroundColor = ContextCompat.getColor(this, uvd.currentPhase.backgroundColor)
 
         val sdf = SimpleDateFormat(getString(R.string.hh_mm), Locale.getDefault())
 
-        if (this.firstTime) {
-            todaysMessage.animate()
-                    .alpha(1f)
-                    .setDuration(200)
-                    .start()
-
-            sunView.animate()
-                    .alpha(1f)
-                    .setDuration(300)
-                    .start()
-
-            location.animate()
-                    .alpha(1f)
-                    .setDuration(200)
-                    .start()
-
-            share.animate()
-                    .alpha(1f)
-                    .setDuration(200)
-                    .start()
+        if (firstTime) {
+            todaysMessage.animate(duration = 200)
+            location.animate(duration = 200)
+            sunView.animate(duration = 300)
+            share.animate(duration = 200)
         }
 
-        todaysMessage.text = uvd.todaysMessage
-        todaysMessage.setTextColor(ContextCompat.getColor(this, secColor))
-        location.setTextColor(ContextCompat.getColor(this, secColor))
+        todaysMessage.apply {
+            text = uvd.todaysMessage
+            setTextColor(secondaryColor)
+        }
 
-        share.setTextColor(ContextCompat.getColor(this, secColor))
-        location.text = uvd.locationMessage
+        location.apply {
+            text = uvd.locationMessage
+            setTextColor(secondaryColor)
+        }
 
-        sunView.setColor(ContextCompat.getColor(this, priColor))
-        sunView.setStartLabel(uvd.sunriseText)
-        sunView.setEndLabel(uvd.sunsetText)
-        val title = title as? TextView ?: return
-        title.setTextColor(ContextCompat.getColor(this, secColor))
-        sunCircle.setColorFilter(ContextCompat.getColor(this, secColor), PorterDuff.Mode.SRC)
+        share.setTextColor(secondaryColor)
+
+        sunView.apply {
+            setColor(primaryColor)
+            sunView.setStartLabel(uvd.sunriseText)
+            sunView.setEndLabel(uvd.sunsetText)
+        }
+
+        (title as? TextView)?.setTextColor(secondaryColor)
+
+        sunCircle.setColorFilter(secondaryColor, PorterDuff.Mode.SRC)
         sunView.setFloatingLabel(sdf.format(Date()))
 
-        val colorFrom = (activitySun.getBackground() as ColorDrawable).color
-        val colorTo = ContextCompat.getColor(this, color)
-        animateBackground(colorFrom, colorTo)
+        (activitySun.background as? ColorDrawable)?.color?.let {
+            animateBackground(it, backgroundColor)
+        }
+
 
         titleWrapper.setOnClickListener { showInfoActivity(uvd.currentPhase.name) }
 
-        sunView.setColor(ContextCompat.getColor(this, priColor))
-                .setStartLabel(uvd.sunriseText)
-                .setEndLabel(uvd.sunsetText)
-                .setFloatingLabel(sdf.format(Date()))
-                .setPercentProgress(uvd.progress)
+        sunView.apply {
+            setColor(primaryColor)
+            setStartLabel(uvd.sunriseText)
+            setEndLabel(uvd.sunsetText)
+            setFloatingLabel(sdf.format(Date()))
+            setPercentProgress(uvd.progress)
+        }
 
         firstTime = false
     }
 
     private fun showInfoActivity(phaseName: String) {
-        val intent = Intent(this, InfoActivity::class.java)
-        intent.putExtra(InfoActivity.PHASE_NAME, phaseName)
-        startActivity(intent)
-        overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+        startActivityWithTransition<InfoActivity> {
+            putExtra(InfoActivity.PHASE_NAME, phaseName)
+        }
     }
 
     private fun animateBackground(colorFrom: Int, colorTo: Int) {
-        if (colorFrom == colorTo) {
-            return
-        }
+        if (colorFrom == colorTo) return
 
-        val colorAnimation = ValueAnimator.ofObject(ArgbEvaluator(), colorFrom, colorTo)
-        colorAnimation.duration = 400
-        colorAnimation.addUpdateListener { animator ->
-            val color = animator.animatedValue as Int
-            activitySun.setBackgroundColor(color)
+        ValueAnimator.ofObject(ArgbEvaluator(), colorFrom, colorTo).apply {
+            duration = 400
+            addUpdateListener { activitySun.setBackgroundColor(it.animatedValue as Int) }
+            start()
         }
-        colorAnimation.start()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-
-        if (sunsetBroadcastReceiver != null) {
-            this.unregisterReceiver(sunsetBroadcastReceiver)
-        }
-
-        if (timeReceiver != null) {
-            this.unregisterReceiver(timeReceiver)
-        }
+        unregisterReceiver(sunsetBroadcastReceiver)
+        unregisterReceiver(timeReceiver)
     }
 }
 
