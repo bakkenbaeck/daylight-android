@@ -41,6 +41,7 @@ class SunsetService : Service(), GoogleApiClient.ConnectionCallbacks, GoogleApiC
     private val prefs: SolPreferences by lazy { SolPreferences(this) }
 
     private var shouldTryAndShowNotification: Boolean = false
+    private var lastRefreshTime: Long = 0
 
     private fun createGoogleApiClient(): GoogleApiClient {
         return GoogleApiClient.Builder(this)
@@ -81,7 +82,8 @@ class SunsetService : Service(), GoogleApiClient.ConnectionCallbacks, GoogleApiC
 
     private fun updateLocation(location: Location?) {
         val safeLocation = storeLocation(location)
-        val threeDayPhases = ThreeDayPhases().init(safeLocation)
+        if (!shouldRefresh()) return
+        val threeDayPhases = ThreeDayPhases(safeLocation)
         val tomorrowsSunrise = threeDayPhases.tomorrowsSunrise
 
         val currentPhaseName = threeDayPhases.currentPhase.name
@@ -116,6 +118,16 @@ class SunsetService : Service(), GoogleApiClient.ConnectionCallbacks, GoogleApiC
         }
 
         return this.prefs.cachedLocation
+    }
+
+    private fun shouldRefresh(): Boolean {
+        val refreshRate: Long = 5000
+        val nextRefreshThreshold = lastRefreshTime + refreshRate
+        val shouldRefresh = System.currentTimeMillis() > nextRefreshThreshold
+        if (shouldRefresh) {
+            lastRefreshTime = System.currentTimeMillis()
+        }
+        return shouldRefresh
     }
 
     private fun tryAndShowNotification(todaysMessage: String) {
