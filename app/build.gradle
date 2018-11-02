@@ -1,13 +1,15 @@
 apply plugin: 'com.android.application'
 
-android {
-    compileSdkVersion 25
-    buildToolsVersion "24.0.3"
+apply plugin: 'kotlin-android'
 
+apply plugin: 'kotlin-android-extensions'
+
+android {
+    compileSdkVersion 26
     defaultConfig {
         applicationId "com.bakkenbaeck.sol"
         minSdkVersion 14
-        targetSdkVersion 25
+        targetSdkVersion 26
         versionCode 6
         versionName "1.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -19,20 +21,23 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
-    dataBinding {
-        enabled = true
-    }
 }
 
 dependencies {
-    compile (
-            // Support
-            'com.android.support:appcompat-v7:25.0.1',
-            // Google Play -- Location
-            'com.google.android.gms:play-services-location:10.0.1',
-            // Prettyness
-            'uk.co.chrisjenx:calligraphy:2.2.0',
-            'com.github.bakkenbaeck.sunviewlib:sunviewlib:v1.0.2'
-    )
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    // Support
+    implementation "com.android.support:appcompat-v7:26.1.0"
+
+    implementation "com.google.android.gms:play-services-location:16.0.0"
+
+    // Prettyness
+    implementation "uk.co.chrisjenx:calligraphy:2.3.0"
+    implementation "com.github.bakkenbaeck.sunviewlib:sunviewlib:v1.0.2"
+
+    // Test
+    testImplementation "junit:junit:4.12"
+    androidTestImplementation "com.android.support.test:runner:1.0.2"
+    androidTestImplementation "com.android.support.test.espresso:espresso-core:3.0.2"
 }
