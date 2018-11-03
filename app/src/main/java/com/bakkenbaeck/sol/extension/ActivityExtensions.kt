@@ -18,6 +18,10 @@ inline fun <reified T> AppCompatActivity.startActivityWithTransition(func: Inten
 inline fun <reified T> AppCompatActivity.startActivityAndFinish() {
     val intent = Intent(this, T::class.java)
     startActivity(intent)
+    finishWithTransition()
+}
+
+fun AppCompatActivity.finishWithTransition() {
     finish()
     overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
 }
@@ -43,4 +47,9 @@ fun AppCompatActivity.isLocationPermissionGranted(): Boolean {
 
 inline fun <reified T : ViewModel> AppCompatActivity.getViewModel(): T {
     return ViewModelProviders.of(this).get(T::class.java)
+}
+
+fun AppCompatActivity.toOnOrOff(value: Boolean): String {
+    val resourceId = if (value) R.string.off else R.string.on
+    return getString(resourceId)
 }
