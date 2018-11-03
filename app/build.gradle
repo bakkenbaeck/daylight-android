@@ -6,7 +6,6 @@ apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion 28
-    buildToolsVersion '28.0.3'
     dataBinding.enabled = true
     defaultConfig {
         applicationId "com.bakkenbaeck.sol"
@@ -25,22 +24,41 @@ android {
     }
 }
 
+def versions = [
+    support: "28.0.0",
+    playServices: "16.0.0",
+    archComponents: "1.1.1",
+    calligraphy: "2.3.0",
+    sunView: "v1.0.3",
+    jUnit: "4.12",
+    testRunner: "1.0.2",
+    espresso: "3.0.2"
+]
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     // Support
-    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation "com.android.support:appcompat-v7:$versions.support"
 
-    // Location awareness
-    implementation "com.google.android.gms:play-services-location:16.0.0"
+    // Location
+    implementation "com.google.android.gms:play-services-location:$versions.playServices"
+    implementation "com.android.support:animated-vector-drawable:$versions.support" // workaround
+    implementation "com.android.support:mediarouter-v7:$versions.support"           // workaround
+    implementation "com.android.support:support-v4:$versions.support"               // workaround
+
+    // Lifecycle components
+    implementation "android.arch.lifecycle:viewmodel:$versions.archComponents"
+    implementation "android.arch.lifecycle:extensions:$versions.archComponents"
+    annotationProcessor "android.arch.lifecycle:compiler:$versions.archComponents"
 
     // Prettyness
-    implementation "uk.co.chrisjenx:calligraphy:2.3.0"
-    implementation "com.github.bakkenbaeck.sunviewlib:sunviewlib:v1.0.2"
+    implementation "uk.co.chrisjenx:calligraphy:$versions.calligraphy"
+    implementation "com.github.anskaal:sunviewlib:$versions.sunView"
 
     // Test
-    testImplementation "junit:junit:4.12"
-    androidTestImplementation "com.android.support.test:runner:1.0.2"
-    androidTestImplementation "com.android.support.test.espresso:espresso-core:3.0.2"
+    testImplementation "junit:junit:$versions.jUnit"
+    androidTestImplementation "com.android.support.test:runner:$versions.testRunner"
+    androidTestImplementation "com.android.support.test.espresso:espresso-core:$versions.espresso"
 }
