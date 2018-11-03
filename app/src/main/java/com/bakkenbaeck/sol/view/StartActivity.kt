@@ -1,10 +1,6 @@
 package com.bakkenbaeck.sol.view
 
-import android.Manifest
-import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.text.Html
 import android.text.Spanned
@@ -34,15 +30,10 @@ class StartActivity : BaseActivity() {
     }
 
     private fun checkForLocationPermission() {
-        val locationPermissionGranted = ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
-        if (!locationPermissionGranted) {
+        if (!isLocationPermissionGranted()) {
             initView()
         } else {
-            val intent = Intent(this, SunActivity::class.java)
-            startActivity(intent)
-            finish()
-            overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+            startActivityAndFinish<SunActivity>()
         }
     }
 
