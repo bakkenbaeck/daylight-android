@@ -1,6 +1,8 @@
 package com.bakkenbaeck.sol.extension
 
 import android.Manifest
+import android.arch.lifecycle.ViewModel
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.support.v4.app.ActivityCompat
@@ -37,4 +39,8 @@ fun AppCompatActivity.isLocationPermissionGranted(): Boolean {
     val locationPermission = Manifest.permission.ACCESS_COARSE_LOCATION
     val getPermissionState = ActivityCompat.checkSelfPermission(this, locationPermission)
     return getPermissionState == PackageManager.PERMISSION_GRANTED
+}
+
+inline fun <reified T : ViewModel> AppCompatActivity.getViewModel(): T {
+    return ViewModelProviders.of(this).get(T::class.java)
 }

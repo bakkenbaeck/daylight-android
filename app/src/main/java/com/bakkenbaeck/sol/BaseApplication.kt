@@ -6,6 +6,14 @@ import uk.co.chrisjenx.calligraphy.CalligraphyConfig
 
 class BaseApplication : Application() {
 
+    companion object {
+        lateinit var instance: BaseApplication
+    }
+
+    init {
+        instance = this
+    }
+
     override fun onCreate() {
         super.onCreate()
         initCalligraphy()
