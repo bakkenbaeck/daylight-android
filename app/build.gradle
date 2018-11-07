@@ -55,7 +55,6 @@ dependencies {
 
     // Prettyness
     implementation "uk.co.chrisjenx:calligraphy:$versions.calligraphy"
-    implementation "com.github.anskaal:sunviewlib:$versions.sunView"
 
     // Test
     testImplementation "junit:junit:$versions.jUnit"
