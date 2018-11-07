@@ -159,6 +159,8 @@ class SunActivity : BaseActivity() {
 
     private fun initListeners() {
         titleWrapper.setOnClickListener { showInfoActivity() }
+
+        // TODO Remove this listener
         todaysMessage.setOnClickListener {
             val oldDate = viewModel.date.value ?: return@setOnClickListener
             val newTime = oldDate.time - (1000*60*60)
