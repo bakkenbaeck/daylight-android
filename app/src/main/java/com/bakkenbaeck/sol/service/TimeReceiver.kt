@@ -3,10 +3,10 @@ package com.bakkenbaeck.sol.service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import com.bakkenbaeck.sol.BaseApplication
 
 class TimeReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        val service = Intent(context, SunsetService::class.java)
-        context.startService(service)
+        BaseApplication.instance.refreshLocation(false)
     }
 }

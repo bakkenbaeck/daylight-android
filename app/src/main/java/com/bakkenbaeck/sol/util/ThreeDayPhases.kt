@@ -2,6 +2,7 @@ package com.bakkenbaeck.sol.util
 
 
 import android.location.Location
+import com.bakkenbaeck.sol.model.local.Phase
 
 import com.florianmski.suncalc.SunCalc
 import com.florianmski.suncalc.models.SunPhase
@@ -74,15 +75,15 @@ class ThreeDayPhases(location: Location) {
             return sunset.endDate.timeInMillis
         }
 
-    val currentPhase: CurrentPhase
+    val currentPhase: Phase
         get() {
             val now = Calendar.getInstance()
             for (phase in todaysSunPhases) {
                 if (phase.endDate.after(now)) {
-                    return CurrentPhase(phase)
+                    return Phase(phase)
                 }
             }
-            return CurrentPhase(todaysSunPhases[0])
+            return Phase(todaysSunPhases[0])
         }
 
     private fun createCalendarWithDayOffset(dayOffset: Int): Calendar {

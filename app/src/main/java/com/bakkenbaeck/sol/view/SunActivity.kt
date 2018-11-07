@@ -3,19 +3,26 @@ package com.bakkenbaeck.sol.view
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.arch.lifecycle.Observer
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.PorterDuff
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.widget.TextView
+import com.bakkenbaeck.sol.BaseApplication
 import com.bakkenbaeck.sol.R
 import com.bakkenbaeck.sol.extension.startActivityWithTransition
 import com.bakkenbaeck.sol.extension.animate
+import com.bakkenbaeck.sol.extension.calculateProgress
 import com.bakkenbaeck.sol.extension.getViewModel
+import com.bakkenbaeck.sol.extension.observe
 import com.bakkenbaeck.sol.extension.requireLocationPermission
-import com.bakkenbaeck.sol.util.UserVisibleData
+import com.bakkenbaeck.sol.model.local.Phase
+import com.bakkenbaeck.sol.service.TimeReceiver
 import com.bakkenbaeck.sol.viewModel.SunViewModel
-import uk.co.chrisjenx.calligraphy.TypefaceUtils
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -31,15 +38,15 @@ class SunActivity : BaseActivity() {
 
     companion object {
         private const val PERMISSION_REQUEST_CODE = 123
-        private const val FONT_PATH = "fonts/gtamericalight.ttf"
     }
 
     private lateinit var viewModel: SunViewModel
+    private val sunsetBroadcastReceiver by lazy { SunsetBroadcastReceiver() }
+    private val timeReceiver by lazy { TimeReceiver() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sun)
-
         init()
     }
 
@@ -47,7 +54,9 @@ class SunActivity : BaseActivity() {
         initViewModel()
         initTypeface()
         checkForLocationPermission()
+        initBroadcastReceivers()
         initObservers()
+        initListeners()
     }
 
     private fun initViewModel() {
@@ -55,13 +64,13 @@ class SunActivity : BaseActivity() {
     }
 
     private fun initTypeface() {
-        val loadedTypeface = TypefaceUtils.load(assets, FONT_PATH)
-        sunView.setTypeface(loadedTypeface)
+//        val loadedTypeface = TypefaceUtils.load(assets, FONT_PATH)
+//        sunView.setTypeface(loadedTypeface)
     }
 
     private fun checkForLocationPermission() {
         requireLocationPermission(PERMISSION_REQUEST_CODE) {
-            viewModel.startLocationService()
+            refreshLocation()
         }
     }
 
@@ -69,12 +78,30 @@ class SunActivity : BaseActivity() {
                                             permissions: Array<String>,
                                             grantResults: IntArray) {
 
-        if (requestCode == PERMISSION_REQUEST_CODE) viewModel.startLocationService()
+        if (requestCode == PERMISSION_REQUEST_CODE) refreshLocation()
     }
+
+    private fun refreshLocation() {
+        BaseApplication.instance.refreshLocation(false)
+    }
+
+    private fun initBroadcastReceivers() {
+        val intentFilter = IntentFilter(BaseApplication.ACTION_UPDATE).apply {
+            addCategory(Intent.CATEGORY_DEFAULT)
+        }
+        registerReceiver(sunsetBroadcastReceiver, intentFilter)
+        registerReceiver(timeReceiver, IntentFilter(Intent.ACTION_TIME_TICK))
+    }
+
     private fun initObservers() {
-        viewModel.userVisibleData.observe(this, Observer {
-            if (it != null) updateView(it)
-        })
+        observe(viewModel.todaysMessage) { todaysMessage.text = it }
+        observe(viewModel.locationMessage) { location.text = it }
+        observe(viewModel.sunrise) { updateSunriseText(it) }
+        observe(viewModel.sunset) { updateSunsetText(it) }
+        observe(viewModel.progress) { sunView.setPercentProgress(it) }
+        observe(viewModel.currentPhase) { updateColors(it) }
+        observe(viewModel.date) { updateDate(it) }
+
         viewModel.shouldAnimate.observe(this, Observer {
             if (it != true) return@Observer
 
@@ -87,53 +114,65 @@ class SunActivity : BaseActivity() {
         })
     }
 
-    private fun updateView(uvd: UserVisibleData) {
-        val primaryColor = ContextCompat.getColor(this, uvd.currentPhase.primaryColor)
-        val secondaryColor = ContextCompat.getColor(this, uvd.currentPhase.secondaryColor)
-        val backgroundColor = ContextCompat.getColor(this, uvd.currentPhase.backgroundColor)
+    private fun updateColors(phase: Phase) {
+        updatePrimaryColor(phase.primaryColor)
+        updateSecondaryColor(phase.secondaryColor)
+        updateBackgroundColor(phase.backgroundColor)
+    }
 
+    private fun updateSunriseText(sunriseText: Long) {
         val sdf = SimpleDateFormat(getString(R.string.hh_mm), Locale.getDefault())
+        sunView.setStartLabel(sdf.format(sunriseText))
+    }
 
-        todaysMessage.apply {
-            text = uvd.todaysMessage
-            setTextColor(secondaryColor)
-        }
+    private fun updateSunsetText(sunsetText: Long) {
+        val sdf = SimpleDateFormat(getString(R.string.hh_mm), Locale.getDefault())
+        sunView.setEndLabel(sdf.format(sunsetText))
+    }
 
-        location.apply {
-            text = uvd.locationMessage
-            setTextColor(secondaryColor)
-        }
+    private fun updatePrimaryColor(reference: Int) {
+        val primaryColor = ContextCompat.getColor(this, reference)
 
+        todaysMessage.setTextColor(primaryColor)
+        sunView.setColor(primaryColor)
+    }
+
+    private fun updateSecondaryColor(reference: Int) {
+        val secondaryColor = ContextCompat.getColor(this, reference)
+
+        location.setTextColor(secondaryColor)
         share.setTextColor(secondaryColor)
-
-        sunView.apply {
-            setColor(primaryColor)
-            sunView.setStartLabel(uvd.sunriseText)
-            sunView.setEndLabel(uvd.sunsetText)
-        }
-
         (title as? TextView)?.setTextColor(secondaryColor)
-
         sunCircle.setColorFilter(secondaryColor, PorterDuff.Mode.SRC)
-        sunView.setFloatingLabel(sdf.format(Date()))
+    }
 
-        (activitySun.background as? ColorDrawable)?.color?.let {
-            animateBackground(it, backgroundColor)
-        }
+    private fun updateBackgroundColor(reference: Int) {
+        val backgroundColor = ContextCompat.getColor(this, reference)
+        val background = activitySun.background as? ColorDrawable ?: return
+        animateBackground(background.color, backgroundColor)
+    }
 
+    private fun updateDate(date: Date) {
+        val sdf = SimpleDateFormat(getString(R.string.hh_mm), Locale.getDefault())
+        sunView.setFloatingLabel(sdf.format(date))
+    }
 
-        titleWrapper.setOnClickListener { showInfoActivity(uvd.currentPhase.name) }
+    private fun initListeners() {
+        titleWrapper.setOnClickListener { showInfoActivity() }
+        todaysMessage.setOnClickListener {
+            val oldDate = viewModel.date.value ?: return@setOnClickListener
+            val newTime = oldDate.time - (1000*60*60)
+            viewModel.date.postValue(Date(newTime))
 
-        sunView.apply {
-            setColor(primaryColor)
-            setStartLabel(uvd.sunriseText)
-            setEndLabel(uvd.sunsetText)
-            setFloatingLabel(sdf.format(Date()))
-            setPercentProgress(uvd.progress)
+            val sunriseTime = viewModel.sunrise.value ?: return@setOnClickListener
+            val sunsetTime = viewModel.sunset.value ?: return@setOnClickListener
+            val progress = Pair(sunriseTime, sunsetTime).calculateProgress(newTime)
+            viewModel.progress.postValue(progress)
         }
     }
 
-    private fun showInfoActivity(phaseName: String) {
+    private fun showInfoActivity() {
+        val phaseName = viewModel.currentPhase.value?.name ?: return
         startActivityWithTransition<InfoActivity> {
             putExtra(InfoActivity.PHASE_NAME, phaseName)
         }
@@ -147,6 +186,18 @@ class SunActivity : BaseActivity() {
             addUpdateListener { activitySun.setBackgroundColor(it.animatedValue as Int) }
             start()
         }
+    }
+
+    inner class SunsetBroadcastReceiver : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            viewModel.updateLiveData(intent)
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(sunsetBroadcastReceiver)
+        unregisterReceiver(timeReceiver)
     }
 }
 

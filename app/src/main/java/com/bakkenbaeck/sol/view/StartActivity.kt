@@ -2,12 +2,11 @@ package com.bakkenbaeck.sol.view
 
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
-import android.text.Html
-import android.text.Spanned
 import com.bakkenbaeck.sol.R
 import com.bakkenbaeck.sol.extension.isLocationPermissionGranted
 import com.bakkenbaeck.sol.extension.requestLocationPermission
 import com.bakkenbaeck.sol.extension.startActivityAndFinish
+import com.bakkenbaeck.sol.extension.toHtml
 import kotlinx.android.synthetic.main.activity_start.infoMessage
 import kotlinx.android.synthetic.main.activity_start.root
 
@@ -42,7 +41,7 @@ class StartActivity : BaseActivity() {
     }
 
     private fun assignClickListeners() {
-        infoMessage.text = convertToHtml(requestLocationMessage)
+        infoMessage.text = requestLocationMessage.toHtml()
         root.setOnClickListener { requestLocationPermission(PERMISSION_REQUEST_CODE_LOCATION) }
     }
 
@@ -52,14 +51,6 @@ class StartActivity : BaseActivity() {
 
         if (requestCode == PERMISSION_REQUEST_CODE_LOCATION && isLocationPermissionGranted()) {
             startActivityAndFinish<SunActivity>()
-        }
-    }
-
-    private fun convertToHtml(message: String): Spanned {
-        return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            Html.fromHtml(message, Html.FROM_HTML_MODE_LEGACY)
-        } else {
-            Html.fromHtml(message)
         }
     }
 }

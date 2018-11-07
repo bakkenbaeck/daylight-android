@@ -6,15 +6,15 @@ import android.arch.lifecycle.Observer
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
-import android.text.Html
 import android.text.Spanned
 import android.text.method.LinkMovementMethod
 import android.widget.TextView
 import com.bakkenbaeck.sol.R
 import com.bakkenbaeck.sol.extension.finishWithTransition
 import com.bakkenbaeck.sol.extension.getViewModel
+import com.bakkenbaeck.sol.extension.toHtml
 import com.bakkenbaeck.sol.extension.toOnOrOff
-import com.bakkenbaeck.sol.util.CurrentPhase
+import com.bakkenbaeck.sol.model.local.Phase
 import com.bakkenbaeck.sol.viewModel.InfoViewModel
 import kotlinx.android.synthetic.main.activity_info.notificationText
 import kotlinx.android.synthetic.main.activity_info.notificationValue
@@ -73,7 +73,7 @@ class InfoActivity : BaseActivity() {
 
     private fun setColorsFromPhaseName(animateBackground: Boolean = false) {
         val phaseName = intent.getStringExtra(PHASE_NAME)
-        val currentPhase = CurrentPhase(phaseName)
+        val currentPhase = Phase(phaseName)
 
         val primaryColor = ContextCompat.getColor(this, currentPhase.primaryColor)
         val secondaryColor = ContextCompat.getColor(this, currentPhase.secondaryColor)
@@ -92,10 +92,10 @@ class InfoActivity : BaseActivity() {
     private fun createInfoMessage(primaryColor: Int): Spanned {
         val message = resources.getString(R.string.info_message)
         val formattedInfo = message.replace("{color}", primaryColor.toString())
-        return convertToHtml(formattedInfo)
+        return formattedInfo.toHtml()
     }
 
-    private fun initBackground(currentPhase: CurrentPhase, animate: Boolean) {
+    private fun initBackground(currentPhase: Phase, animate: Boolean) {
         val colorFrom = (root.background as ColorDrawable).color
         val colorTo = ContextCompat.getColor(this, currentPhase.backgroundColor)
         if (animate) {
@@ -114,7 +114,7 @@ class InfoActivity : BaseActivity() {
         }
     }
 
-    private fun setSunDrawable(currentPhase: CurrentPhase) {
+    private fun setSunDrawable(currentPhase: Phase) {
         val color = currentPhase.secondaryColor
         val drawable = color2drawable[color] ?: return
         setSunDrawable(drawable)
@@ -132,14 +132,6 @@ class InfoActivity : BaseActivity() {
             duration = 400
             addUpdateListener { root.setBackgroundColor(it.animatedValue as Int) }
             start()
-        }
-    }
-
-    private fun convertToHtml(message: String): Spanned {
-        return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            Html.fromHtml(message, Html.FROM_HTML_MODE_LEGACY)
-        } else {
-            Html.fromHtml(message)
         }
     }
 

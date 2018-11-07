@@ -1,9 +1,9 @@
-package com.bakkenbaeck.sol.util
+package com.bakkenbaeck.sol.model.local
 
 import com.bakkenbaeck.sol.R
 import com.florianmski.suncalc.models.SunPhase
 
-class CurrentPhase(val name: String) {
+class Phase(val name: String) {
 
     companion object {
         val backgroundMap = mapOf(

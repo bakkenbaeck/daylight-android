@@ -10,8 +10,8 @@ import android.os.Handler
 import android.service.wallpaper.WallpaperService
 import android.support.v4.content.ContextCompat
 import android.view.SurfaceHolder
+import com.bakkenbaeck.sol.BaseApplication
 
-import com.bakkenbaeck.sol.service.SunsetService
 import com.bakkenbaeck.sol.util.UserVisibleData
 
 class LiveWallpaper : WallpaperService() {
@@ -45,18 +45,12 @@ class LiveWallpaper : WallpaperService() {
 
         private fun updateWallpaper() {
             registerForSunPhaseChanges()
-            startSunsetService()
-        }
-
-        private fun startSunsetService() {
-            val service = Intent(this.context, SunsetService::class.java)
-            service.putExtra(SunsetService.EXTRA_SHOW_NOTIFICATION, false)
-            startService(service)
+            BaseApplication.instance.refreshLocation(false)
         }
 
         private fun registerForSunPhaseChanges() {
             val receiver = SunsetBroadcastReceiver(this)
-            val intentFilter = IntentFilter(SunsetService.ACTION_UPDATE)
+            val intentFilter = IntentFilter(BaseApplication.ACTION_UPDATE)
             intentFilter.addCategory(Intent.CATEGORY_DEFAULT)
             applicationContext.registerReceiver(receiver, intentFilter)
         }

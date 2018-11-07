@@ -49,10 +49,6 @@
         <receiver android:name=".service.AlarmReceiver"/>
 
         <service
-            android:name=".service.SunsetService"
-            android:exported="false"/>
-
-        <service
             android:name=".wallpaper.LiveWallpaper"
             android:enabled="true"
             android:label="@string/app_name"

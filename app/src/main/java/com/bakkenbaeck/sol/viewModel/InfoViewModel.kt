@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import com.bakkenbaeck.sol.BaseApplication
-import com.bakkenbaeck.sol.service.SunsetService
 import com.bakkenbaeck.sol.util.SolPreferences
 
 class InfoViewModel : ViewModel() {
@@ -24,7 +23,7 @@ class InfoViewModel : ViewModel() {
     }
 
     private fun registerForSunPhaseChanges() {
-        val intentFilter = IntentFilter(SunsetService.ACTION_UPDATE)
+        val intentFilter = IntentFilter(BaseApplication.ACTION_UPDATE)
         intentFilter.addCategory(Intent.CATEGORY_DEFAULT)
         BaseApplication.instance.registerReceiver(sunsetBroadcastReceiver, intentFilter)
     }

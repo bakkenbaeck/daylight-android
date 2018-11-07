@@ -15,30 +15,24 @@ import android.support.v4.content.ContextCompat
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.RemoteViews
+import com.bakkenbaeck.sol.BaseApplication
 
 import com.bakkenbaeck.sol.R
-import com.bakkenbaeck.sol.service.SunsetService
 import com.bakkenbaeck.sol.view.StartActivity
 import com.bakkenbaeck.sol.util.UserVisibleData
-import com.bakkenbaeck.sunviewlib.SunView
+import com.bakkenbaeck.sol.view.custom.SunView
 
 class DashboardWidget : AppWidgetProvider() {
 
     companion object {
         internal fun updateAppWidget(context: Context) {
             registerForSunPhaseChanges(context)
-            startSunsetService(context)
-        }
-
-        private fun startSunsetService(context: Context) {
-            val service = Intent(context, SunsetService::class.java)
-            service.putExtra(SunsetService.EXTRA_SHOW_NOTIFICATION, false)
-            context.startService(service)
+            BaseApplication.instance.refreshLocation(false)
         }
 
         private fun registerForSunPhaseChanges(context: Context) {
             val receiver = SunsetBroadcastReceiver()
-            val intentFilter = IntentFilter(SunsetService.ACTION_UPDATE)
+            val intentFilter = IntentFilter(BaseApplication.ACTION_UPDATE)
             intentFilter.addCategory(Intent.CATEGORY_DEFAULT)
 
             context.applicationContext.registerReceiver(receiver, intentFilter)
