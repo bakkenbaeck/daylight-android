@@ -48,6 +48,8 @@
         </receiver>
         <receiver android:name=".service.AlarmReceiver"/>
 
+        <service android:name=".service.LocationIntentService" />
+
         <service
             android:name=".wallpaper.LiveWallpaper"
             android:enabled="true"
