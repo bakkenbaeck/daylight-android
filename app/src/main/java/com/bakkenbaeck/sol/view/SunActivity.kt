@@ -18,7 +18,6 @@ import com.bakkenbaeck.sol.extension.startActivityWithTransition
 import com.bakkenbaeck.sol.extension.animate
 import com.bakkenbaeck.sol.extension.calculateProgress
 import com.bakkenbaeck.sol.extension.getViewModel
-import com.bakkenbaeck.sol.extension.observe
 import com.bakkenbaeck.sol.extension.requireLocationPermission
 import com.bakkenbaeck.sol.model.local.Phase
 import com.bakkenbaeck.sol.service.TimeReceiver
@@ -94,24 +93,39 @@ class SunActivity : BaseActivity() {
     }
 
     private fun initObservers() {
-        observe(viewModel.todaysMessage) { todaysMessage.text = it }
-        observe(viewModel.locationMessage) { location.text = it }
-        observe(viewModel.sunrise) { updateSunriseText(it) }
-        observe(viewModel.sunset) { updateSunsetText(it) }
-        observe(viewModel.progress) { sunView.setPercentProgress(it) }
-        observe(viewModel.currentPhase) { updateColors(it) }
-        observe(viewModel.date) { updateDate(it) }
-
-        viewModel.shouldAnimate.observe(this, Observer {
-            if (it != true) return@Observer
-
-            todaysMessage.animate(duration = 200)
-            location.animate(duration = 200)
-            sunView.animate(duration = 300)
-            share.animate(duration = 200)
-
-            viewModel.shouldAnimate.value = false
+        viewModel.todaysMessage.observe(this, Observer {
+            if (it != null) todaysMessage.text = it
         })
+        viewModel.locationMessage.observe(this, Observer {
+            if (it != null) location.text = it
+        })
+        viewModel.sunrise.observe(this, Observer {
+            if (it != null) updateSunriseText(it)
+        })
+        viewModel.sunset.observe(this, Observer {
+            if (it != null) updateSunsetText(it)
+        })
+        viewModel.progress.observe(this, Observer {
+            if (it != null) sunView.setPercentProgress(it)
+        })
+        viewModel.currentPhase.observe(this, Observer {
+            if (it != null) updateColors(it)
+        })
+        viewModel.date.observe(this, Observer {
+            if (it != null) updateDate(it)
+        })
+        viewModel.shouldAnimate.observe(this, Observer {
+            if (it == true) animateViews()
+        })
+    }
+
+    private fun animateViews() {
+        todaysMessage.animate(duration = 200)
+        location.animate(duration = 200)
+        sunView.animate(duration = 300)
+        share.animate(duration = 200)
+
+        viewModel.shouldAnimate.value = false
     }
 
     private fun updateColors(phase: Phase) {
