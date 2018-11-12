@@ -8,6 +8,7 @@ import android.content.Intent
 import android.location.Location
 import com.bakkenbaeck.sol.BaseApplication
 import com.bakkenbaeck.sol.extension.getAlarmService
+import com.bakkenbaeck.sol.extension.isLocationPermissionGranted
 import com.bakkenbaeck.sol.util.DailyMessage
 import com.bakkenbaeck.sol.util.SolPreferences
 import com.bakkenbaeck.sol.util.ThreeDayPhases
@@ -37,6 +38,7 @@ class LocationIntentService : IntentService("LocationIntentService") {
     fun refreshLocation(displayNotification: Boolean) {
         try {
             val locationClient = BaseApplication.instance.locationClient
+            if (!isLocationPermissionGranted()) return
             locationClient.lastLocation.addOnCompleteListener {
                 updateLocation(it.result, displayNotification)
             }

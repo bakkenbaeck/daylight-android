@@ -4,7 +4,6 @@ import android.Manifest
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AppCompatActivity
 import com.bakkenbaeck.sol.R
@@ -37,12 +36,6 @@ fun AppCompatActivity.requireLocationPermission(requestCode: Int, callback: () -
 fun AppCompatActivity.requestLocationPermission(requestCode: Int) {
     val request = arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION)
     ActivityCompat.requestPermissions(this, request, requestCode)
-}
-
-fun AppCompatActivity.isLocationPermissionGranted(): Boolean {
-    val locationPermission = Manifest.permission.ACCESS_COARSE_LOCATION
-    val getPermissionState = ActivityCompat.checkSelfPermission(this, locationPermission)
-    return getPermissionState == PackageManager.PERMISSION_GRANTED
 }
 
 inline fun <reified T : ViewModel> AppCompatActivity.getViewModel(): T {
