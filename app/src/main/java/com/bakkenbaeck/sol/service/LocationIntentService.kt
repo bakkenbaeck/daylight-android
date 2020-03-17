@@ -30,8 +30,8 @@ class LocationIntentService : IntentService("LocationIntentService") {
     private val prefs: SolPreferences by lazy { SolPreferences(applicationContext) }
     private val dailyMessage: DailyMessage by lazy { DailyMessage(applicationContext) }
 
-    override fun onHandleIntent(intent: Intent) {
-        val displayNotification = intent.getBooleanExtra(DISPLAY_NOTIFICATION, false)
+    override fun onHandleIntent(intent: Intent?) {
+        val displayNotification = intent?.getBooleanExtra(DISPLAY_NOTIFICATION, false) ?: false
         refreshLocation(displayNotification)
     }
 

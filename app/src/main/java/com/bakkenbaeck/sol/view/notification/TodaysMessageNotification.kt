@@ -4,8 +4,8 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
-import android.support.v4.app.NotificationCompat
 import android.text.Html
+import androidx.core.app.NotificationCompat
 import com.bakkenbaeck.sol.extension.getNotificationService
 import com.bakkenbaeck.sol.view.SunActivity
 import com.bakkenbaeck.sol.R

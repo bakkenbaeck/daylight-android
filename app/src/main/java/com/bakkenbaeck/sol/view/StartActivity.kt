@@ -1,7 +1,7 @@
 package com.bakkenbaeck.sol.view
 
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
+import androidx.core.content.ContextCompat
 import com.bakkenbaeck.sol.R
 import com.bakkenbaeck.sol.extension.isLocationPermissionGranted
 import com.bakkenbaeck.sol.extension.requestLocationPermission

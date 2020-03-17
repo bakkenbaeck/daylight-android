@@ -1,11 +1,11 @@
 package com.bakkenbaeck.sol.viewModel
 
-import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.bakkenbaeck.sol.BaseApplication
 import com.bakkenbaeck.sol.util.SolPreferences
 

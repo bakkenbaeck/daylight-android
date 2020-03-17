@@ -5,16 +5,22 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
 
     defaultConfig {
         applicationId "com.bakkenbaeck.sol"
-        minSdkVersion 14
-        targetSdkVersion 28
+        minSdkVersion 21
+        targetSdkVersion 29
         versionCode 6
         versionName "1.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     buildTypes {
         release {
             debuggable false
@@ -22,42 +28,27 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-}
 
-def versions = [
-    support: "28.0.0",
-    playServices: "16.0.0",
-    archComponents: "1.1.1",
-    calligraphy: "2.3.0",
-    sunView: "v1.0.3",
-    jUnit: "4.12",
-    testRunner: "1.0.2",
-    espresso: "3.0.2"
-]
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-
-    // Support
-    implementation "com.android.support:appcompat-v7:$versions.support"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation 'androidx.core:core-ktx:1.2.0'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.activity:activity-ktx:1.1.0'
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0"
 
     // Location
-    implementation "com.google.android.gms:play-services-location:$versions.playServices"
-    implementation "com.android.support:animated-vector-drawable:$versions.support" // workaround
-    implementation "com.android.support:mediarouter-v7:$versions.support"           // workaround
-    implementation "com.android.support:support-v4:$versions.support"               // workaround
+    implementation "com.google.android.gms:play-services-location:17.0.0"
 
     // Lifecycle components
-    implementation "android.arch.lifecycle:viewmodel:$versions.archComponents"
-    implementation "android.arch.lifecycle:extensions:$versions.archComponents"
-    annotationProcessor "android.arch.lifecycle:compiler:$versions.archComponents"
+    implementation "android.arch.lifecycle:viewmodel:1.1.1"
+    implementation "android.arch.lifecycle:extensions:1.1.1"
 
-    // Prettyness
-    implementation "uk.co.chrisjenx:calligraphy:$versions.calligraphy"
-
-    // Test
-    testImplementation "junit:junit:$versions.jUnit"
-    androidTestImplementation "com.android.support.test:runner:$versions.testRunner"
-    androidTestImplementation "com.android.support.test.espresso:espresso-core:$versions.espresso"
+    // Font
+    implementation "uk.co.chrisjenx:calligraphy:2.3.0"
 }

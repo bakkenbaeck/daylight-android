@@ -2,7 +2,6 @@ package com.bakkenbaeck.sol.view
 
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
-import android.arch.lifecycle.Observer
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -10,15 +9,12 @@ import android.content.IntentFilter
 import android.graphics.PorterDuff
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
 import android.widget.TextView
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
 import com.bakkenbaeck.sol.BaseApplication
 import com.bakkenbaeck.sol.R
-import com.bakkenbaeck.sol.extension.startActivityWithTransition
-import com.bakkenbaeck.sol.extension.animate
-import com.bakkenbaeck.sol.extension.calculateProgress
-import com.bakkenbaeck.sol.extension.getViewModel
-import com.bakkenbaeck.sol.extension.requireLocationPermission
+import com.bakkenbaeck.sol.extension.*
 import com.bakkenbaeck.sol.model.local.Phase
 import com.bakkenbaeck.sol.service.TimeReceiver
 import com.bakkenbaeck.sol.viewModel.SunViewModel

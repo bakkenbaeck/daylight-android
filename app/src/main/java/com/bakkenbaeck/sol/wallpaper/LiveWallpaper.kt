@@ -8,8 +8,8 @@ import android.content.IntentFilter
 import android.graphics.Canvas
 import android.os.Handler
 import android.service.wallpaper.WallpaperService
-import android.support.v4.content.ContextCompat
 import android.view.SurfaceHolder
+import androidx.core.content.ContextCompat
 import com.bakkenbaeck.sol.BaseApplication
 
 import com.bakkenbaeck.sol.util.UserVisibleData

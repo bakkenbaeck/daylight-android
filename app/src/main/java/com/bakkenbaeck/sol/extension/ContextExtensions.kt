@@ -5,7 +5,7 @@ import android.app.AlarmManager
 import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.PackageManager
-import android.support.v4.app.ActivityCompat
+import androidx.core.app.ActivityCompat
 import java.lang.IllegalStateException
 
 fun Context.getNotificationService(): NotificationManager {

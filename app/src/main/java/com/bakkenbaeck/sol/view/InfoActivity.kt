@@ -2,16 +2,16 @@ package com.bakkenbaeck.sol.view
 
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
-import android.arch.lifecycle.Observer
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
 import android.text.Spanned
 import android.text.method.LinkMovementMethod
 import android.widget.TextView
+import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
 import com.bakkenbaeck.sol.R
 import com.bakkenbaeck.sol.extension.finishWithTransition
-import com.bakkenbaeck.sol.extension.getViewModel
 import com.bakkenbaeck.sol.extension.toHtml
 import com.bakkenbaeck.sol.extension.toOnOrOff
 import com.bakkenbaeck.sol.model.local.Phase
@@ -38,7 +38,7 @@ class InfoActivity : BaseActivity() {
         )
     }
 
-    private lateinit var viewModel: InfoViewModel
+    private val viewModel: InfoViewModel by viewModels()
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,7 +48,6 @@ class InfoActivity : BaseActivity() {
     }
 
     private fun init() {
-        initViewModel()
         initBackground()
         initClickListeners()
         initObservers()
@@ -61,10 +60,6 @@ class InfoActivity : BaseActivity() {
         viewModel.animateBackground.observe(this, Observer {
             if (it != null) setColorsFromPhaseName(it)
         })
-    }
-
-    private fun initViewModel() {
-        viewModel = getViewModel()
     }
 
     private fun initBackground() {

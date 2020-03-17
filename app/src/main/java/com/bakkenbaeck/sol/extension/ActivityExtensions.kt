@@ -1,12 +1,13 @@
 package com.bakkenbaeck.sol.extension
 
 import android.Manifest
-import android.arch.lifecycle.ViewModel
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
-import android.support.v4.app.ActivityCompat
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProviders
 import com.bakkenbaeck.sol.R
+
 
 inline fun <reified T> AppCompatActivity.startActivityWithTransition(func: Intent.() -> Intent) {
     val intent = Intent(this, T::class.java).func()
