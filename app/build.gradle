@@ -6,7 +6,7 @@ apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion 28
-    dataBinding.enabled = true
+
     defaultConfig {
         applicationId "com.bakkenbaeck.sol"
         minSdkVersion 14
