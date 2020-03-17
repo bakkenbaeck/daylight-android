@@ -10,6 +10,7 @@ import android.graphics.PorterDuff
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import com.bakkenbaeck.sol.BaseApplication
@@ -35,7 +36,7 @@ class SunActivity : BaseActivity() {
         private const val PERMISSION_REQUEST_CODE = 123
     }
 
-    private lateinit var viewModel: SunViewModel
+    private val viewModel: SunViewModel by viewModels()
     private val sunsetBroadcastReceiver by lazy { SunsetBroadcastReceiver() }
     private val timeReceiver by lazy { TimeReceiver() }
 
@@ -46,21 +47,10 @@ class SunActivity : BaseActivity() {
     }
 
     private fun init() {
-        initViewModel()
-        initTypeface()
         checkForLocationPermission()
         initBroadcastReceivers()
         initObservers()
         initListeners()
-    }
-
-    private fun initViewModel() {
-        viewModel = getViewModel()
-    }
-
-    private fun initTypeface() {
-//        val loadedTypeface = TypefaceUtils.load(assets, FONT_PATH)
-//        sunView.setTypeface(loadedTypeface)
     }
 
     private fun checkForLocationPermission() {
