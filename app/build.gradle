@@ -4,6 +4,8 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
 
+apply plugin: "androidx.navigation.safeargs.kotlin"
+
 android {
     compileSdkVersion 29
 
@@ -51,4 +53,8 @@ dependencies {
 
     // Font
     implementation "uk.co.chrisjenx:calligraphy:2.3.0"
+
+    // Navigation
+    implementation "androidx.navigation:navigation-fragment-ktx:2.2.1"
+    implementation "androidx.navigation:navigation-ui-ktx:2.2.1"
 }

@@ -7,8 +7,8 @@ import android.graphics.BitmapFactory
 import android.text.Html
 import androidx.core.app.NotificationCompat
 import com.bakkenbaeck.sol.extension.getNotificationService
-import com.bakkenbaeck.sol.view.SunActivity
 import com.bakkenbaeck.sol.R
+import com.bakkenbaeck.sol.view.MainActivity
 
 class TodaysMessageNotification {
 
@@ -20,7 +20,7 @@ class TodaysMessageNotification {
 
         fun show(context: Context, message: String) {
 
-            val resultIntent = Intent(context, SunActivity::class.java)
+            val resultIntent = Intent(context, MainActivity::class.java)
             val resultPendingIntent = PendingIntent.getActivity(
                     context,
                     0,

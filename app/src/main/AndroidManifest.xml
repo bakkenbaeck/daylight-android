@@ -16,19 +16,7 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".view.SunActivity"
-            android:launchMode="singleTask"
-            android:screenOrientation="portrait"
-            android:resizeableActivity="true"/>
-
-        <activity
-            android:name=".view.InfoActivity"
-            android:launchMode="singleTask"
-            android:screenOrientation="portrait"
-            android:resizeableActivity="true"/>
-        
-        <activity
-            android:name=".view.StartActivity"
+            android:name=".view.MainActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:resizeableActivity="true">

@@ -18,8 +18,8 @@ import androidx.core.content.ContextCompat
 import com.bakkenbaeck.sol.BaseApplication
 
 import com.bakkenbaeck.sol.R
-import com.bakkenbaeck.sol.view.StartActivity
 import com.bakkenbaeck.sol.util.UserVisibleData
+import com.bakkenbaeck.sol.view.MainActivity
 import com.bakkenbaeck.sol.view.custom.SunView
 
 class DashboardWidget : AppWidgetProvider() {
@@ -111,9 +111,7 @@ class DashboardWidget : AppWidgetProvider() {
                 setStartLabel(uvd.sunriseText)
                 setEndLabel(uvd.sunsetText)
                 setColor(primaryColor)
-                        .setStartLabel(uvd.sunriseText)
-                        .setEndLabel(uvd.sunsetText)
-                        .setPercentProgress(uvd.progress)
+                setPercentProgress(uvd.progress)
             }
         }
 
@@ -129,7 +127,7 @@ class DashboardWidget : AppWidgetProvider() {
         }
 
         private fun makeWidgetClickable(context: Context, views: RemoteViews) {
-            val intent = Intent(context, StartActivity::class.java)
+            val intent = Intent(context, MainActivity::class.java)
             val pendingIntent = PendingIntent.getActivity(context, 0, intent, 0)
             views.setOnClickPendingIntent(R.id.widget_container, pendingIntent)
         }

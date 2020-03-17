@@ -1,6 +1,7 @@
 package com.bakkenbaeck.sol.extension
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -41,9 +42,4 @@ fun AppCompatActivity.requestLocationPermission(requestCode: Int) {
 
 inline fun <reified T : ViewModel> AppCompatActivity.getViewModel(): T {
     return ViewModelProviders.of(this).get(T::class.java)
-}
-
-fun AppCompatActivity.toOnOrOff(value: Boolean): String {
-    val resourceId = if (value) R.string.off else R.string.on
-    return getString(resourceId)
 }
