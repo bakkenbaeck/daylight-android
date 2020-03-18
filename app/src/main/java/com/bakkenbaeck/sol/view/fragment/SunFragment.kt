@@ -1,6 +1,7 @@
 package com.bakkenbaeck.sol.view.fragment
 
 import android.animation.ArgbEvaluator
+import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.graphics.PorterDuff
 import android.graphics.drawable.ColorDrawable
@@ -13,7 +14,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.bakkenbaeck.sol.R
-import com.bakkenbaeck.sol.extension.animate
 import com.bakkenbaeck.sol.extension.calculateProgress
 import com.bakkenbaeck.sol.extension.getColor
 import com.bakkenbaeck.sol.model.local.Phase
@@ -40,8 +40,14 @@ class SunFragment : Fragment() {
     }
 
     private fun init() {
+        initView()
         initObservers()
         initListeners()
+    }
+
+    private fun initView() {
+        val sunProgress = viewModel.progress.value ?: 0.0
+        setProgress(sunProgress)
     }
 
     private fun initObservers() {
@@ -58,7 +64,7 @@ class SunFragment : Fragment() {
             if (it != null) updateSunsetText(it)
         })
         viewModel.progress.observe(viewLifecycleOwner, Observer {
-            if (it != null) sunView.setPercentProgress(it)
+            if (it != null) setProgress(it)
         })
         viewModel.currentPhase.observe(viewLifecycleOwner, Observer {
             if (it != null) updateColors(it)
@@ -66,9 +72,18 @@ class SunFragment : Fragment() {
         viewModel.date.observe(viewLifecycleOwner, Observer {
             if (it != null) updateDate(it)
         })
-        viewModel.shouldAnimate.observe(viewLifecycleOwner, Observer {
-            if (it == true) animateViews()
-        })
+    }
+
+    private fun setProgress(value: Double) {
+        if (value > 1) return
+        animateSunProgress(value)
+    }
+
+    private fun animateSunProgress(value: Double) {
+        ObjectAnimator.ofFloat(sunView, "percentProgress", value.toFloat()).apply {
+            duration = 300
+            start()
+        }
     }
 
     private fun updateSunriseText(sunriseText: Long) {
@@ -122,15 +137,6 @@ class SunFragment : Fragment() {
     private fun updateDate(date: Date) {
         val sdf = SimpleDateFormat(getString(R.string.hh_mm), Locale.getDefault())
         sunView.setFloatingLabel(sdf.format(date))
-    }
-
-    private fun animateViews() {
-        todaysMessage.animate(duration = 200)
-        location.animate(duration = 200)
-        sunView.animate(duration = 300)
-        share.animate(duration = 200)
-
-        viewModel.shouldAnimate.value = false
     }
 
     private fun initListeners() {

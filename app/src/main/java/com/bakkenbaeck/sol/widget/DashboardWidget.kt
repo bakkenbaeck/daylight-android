@@ -80,10 +80,7 @@ class DashboardWidget : AppWidgetProvider() {
             views.setTextColor(R.id.location_message, ContextCompat.getColor(context, secColor))
         }
 
-        private fun setSunView(
-                context: Context,
-                views: RemoteViews,
-                uvd: UserVisibleData) {
+        private fun setSunView(context: Context, views: RemoteViews, uvd: UserVisibleData) {
             val viewWidth = context.resources.getDimensionPixelSize(R.dimen.widget_width)
             val viewHeight = context.resources.getDimensionPixelSize(R.dimen.widget_height)
 
@@ -111,7 +108,7 @@ class DashboardWidget : AppWidgetProvider() {
                 setStartLabel(uvd.sunriseText)
                 setEndLabel(uvd.sunsetText)
                 setColor(primaryColor)
-                setPercentProgress(uvd.progress)
+                setPercentProgress(uvd.progress.toFloat())
             }
         }
 

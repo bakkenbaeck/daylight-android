@@ -27,7 +27,7 @@ class SunView : View {
     private val viewRect by lazy { Rect() }
 
     private var textMargin = 0f
-    private var horizon_bottom_margin = 0
+    private var horizonBottomMargin = 0
     private var circleRadius = 0
     private var availableViewWidth = 0
     private var strokeWidth = 0
@@ -35,6 +35,8 @@ class SunView : View {
     private var leftMarginLabel = 0f
     private val sunCoordinates: PointF by lazy { PointF(.0f, .0f) }
     private var sunIsVisible = false
+
+    private var currentProgress = 0f
 
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
@@ -47,7 +49,7 @@ class SunView : View {
     init {
         val resources = context.resources
         textMargin = resources.getDimensionPixelSize(R.dimen.sun_text_margin).toFloat()
-        horizon_bottom_margin = resources.getDimensionPixelSize(R.dimen.sun_horizon_bottom_margin)
+        horizonBottomMargin = resources.getDimensionPixelSize(R.dimen.sun_horizon_bottom_margin)
         circleRadius = resources.getDimensionPixelSize(R.dimen.sun_radius)
         strokeWidth = resources.getDimensionPixelSize(R.dimen.sun_stroke_width)
         rightMarginLabel = resources.getDimensionPixelSize(R.dimen.sun_right_margin_label).toFloat()
@@ -57,23 +59,27 @@ class SunView : View {
 
     fun setColor(color: Int) {
         paint.color = color
+        invalidate()
     }
 
     fun setStartLabel(value: String?) {
         startLabel = value ?: ""
+        invalidate()
     }
 
     fun setEndLabel(value: String?) {
         endLabel = value ?: ""
+        invalidate()
     }
 
     fun setFloatingLabel(value: String?) {
         floatingLabel = value ?: ""
+        invalidate()
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         viewRect.apply {
-            top = horizon_bottom_margin - textMargin.toInt()
+            top = horizonBottomMargin - textMargin.toInt()
             right = w
             left = 0
             bottom = h
@@ -108,7 +114,7 @@ class SunView : View {
     }
 
     private fun drawHorizontal(canvas: Canvas) {
-        val y = viewRect.bottom - horizon_bottom_margin.toFloat()
+        val y = viewRect.bottom - horizonBottomMargin.toFloat()
         val fromX = viewRect.right.toFloat()
         val toX = viewRect.left.toFloat()
         canvas.drawLine(toX, y, fromX, y, paint)
@@ -120,10 +126,15 @@ class SunView : View {
     }
 
     private fun clipCanvas(canvas: Canvas) {
-        canvas.clipRect(0,0, canvas.width,canvas.height - horizon_bottom_margin)
+        canvas.clipRect(0,0, canvas.width,canvas.height - horizonBottomMargin)
     }
 
-    fun setPercentProgress(progress: Double) {
+    @Suppress("unused") // Used by object-animator
+    fun getPercentProgress() = currentProgress
+
+    @Suppress("unused") // Used by object-animator
+    fun setPercentProgress(progress: Float) {
+        currentProgress = progress
         val position = Math.PI + progress * Math.PI
         if (progress > 1 || progress < 0) return clearSun()
         sunCoordinates.x = ((50 + cos(position) * 50) / 100).toFloat()
